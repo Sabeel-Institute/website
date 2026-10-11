@@ -30,6 +30,7 @@ expect: |
 image: ./image.webp
 imageAlt: "Title artwork: Raising with Purpose"
 flyer: ./flyer.webp
+home: never
 ---
 
 A monthly support circle for homeschooling moms, in collaboration with MHSC (Muslim HomeSchooling Community of Greater Houston).

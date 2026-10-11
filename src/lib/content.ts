@@ -1,7 +1,7 @@
 import type { ImageMetadata } from 'astro';
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { satteri } from '@astrojs/markdown-satteri';
-import type { AreaId } from '../site.config';
+import { site, type AreaId } from '../site.config';
 import { describeSchedule, type ScheduleText } from './schedule';
 
 export type Program = CollectionEntry<'programs'>;
@@ -20,6 +20,8 @@ export function firstDay(program: Program): Date {
 
 const newestFirst = (a: Program, b: Program) => +firstDay(b) - +firstDay(a);
 const statusRank: Record<Status, number> = { open: 0, ongoing: 1, closed: 2, upcoming: 3, completed: 4 };
+/** Open, ongoing, closed, then upcoming; newest start first within each. */
+const byStatus = (a: Program, b: Program) => statusRank[a.data.status] - statusRank[b.data.status] || newestFirst(a, b);
 
 /** Programs on the site (not drafts) with one of these statuses. */
 const withStatus = (statuses: readonly Status[], area?: AreaId) =>
@@ -30,8 +32,26 @@ const withStatus = (statuses: readonly Status[], area?: AreaId) =>
 
 /** Programs people can join: open first, then newest start first. */
 export async function getCurrentPrograms(area?: AreaId): Promise<Program[]> {
-  const list = await withStatus(['open', 'ongoing'], area);
-  return list.sort((a, b) => statusRank[a.data.status] - statusRank[b.data.status] || newestFirst(a, b));
+  return (await withStatus(['open', 'ongoing'], area)).sort(byStatus);
+}
+
+/**
+ * The home page's programs, up to `site.homeProgramCount`: those with
+ * `home: always` first, then open, ongoing, and closed ones without `home`.
+ * Fails the build when more are pinned than fit (see Home page in AGENTS.md).
+ */
+export async function getHomePrograms(): Promise<Program[]> {
+  const count = site.homeProgramCount;
+  const list = (await withStatus(['open', 'ongoing', 'closed', 'upcoming'])).sort(byStatus);
+  const pinned = list.filter((p) => p.data.home === 'always');
+  if (pinned.length > count) {
+    throw new Error(
+      `${pinned.length} programs have home: always (${pinned.map((p) => p.id).join(', ')}), but the home page ` +
+        `shows ${count}. Keep home: always on at most ${count} of them (see Home page in AGENTS.md).`,
+    );
+  }
+  const others = list.filter((p) => !p.data.home && p.data.status !== 'upcoming');
+  return [...pinned, ...others].slice(0, count);
 }
 
 export async function getUpcomingPrograms(area?: AreaId): Promise<Program[]> {

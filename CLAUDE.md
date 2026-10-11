@@ -4,8 +4,8 @@
 
 - The program schema (`src/content.config.ts`) types only what the site acts
   on: `status`, `area`, `format`, the schedule, `registration`,
-  `financialAid`, `page`, venues, and instructors; what people only read
-  (`audience`, `location`, `fee`, `deadline`, `highlight`, `card`) is free
+  `financialAid`, `page`, `home`, venues, and instructors; what people only
+  read (`audience`, `location`, `fee`, `deadline`, `highlight`, `card`) is free
   text, one line or a list. Its `superRefine` requires `schedule` or `date`
   (not both), `summary` until a program is completed, and `format` while it
   is open or ongoing. The program object, a schedule part, an inline guest
@@ -68,6 +68,13 @@
   fails the build when a program's `image` is not 16:9 (within 0.02). It
   cannot be a schema rule: `image()` does not know an image's size when the
   schema is checked.
+- `getHomePrograms` (`src/lib/content.ts`) fails the build, while the home
+  page builds, when more programs have `home: always` than
+  `site.homeProgramCount`: the schema checks one program at a time, so it
+  cannot count them. Completed and draft programs are not counted, so a pin
+  can stay on a program that has ended. It orders programs with `byStatus`,
+  the order of current programs, which places closed and coming-soon ones
+  after them.
 - `src/assets/images/logo.png` is `sabeel-logo.png` from the brand
   repository (`skills/sabeel-brand/logo/`), scaled to 1600 px wide.
   `public/icon-*.png` are its `sabeel-icon.png` design: the calligraphy

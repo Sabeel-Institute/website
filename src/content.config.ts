@@ -185,6 +185,8 @@ const programs = defineCollection({
         imageAlt: z.string().min(1).optional(),
         /** The original flyer, US Letter portrait (2550 × 3300 px), shown lower on the page. */
         flyer: image().optional(),
+        /** always puts the program on the home page, ahead of the others, until it is completed; never keeps it off. */
+        home: z.enum(['always', 'never']).optional(),
         /** true keeps the program in the repository but off the site: no page and no listing. */
         draft: z.boolean().optional(),
         /**

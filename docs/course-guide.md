@@ -6,7 +6,8 @@ want.
 
 **Contents:** [How it works](#how-it-works) ·
 [Stages](#a-courses-stage-decides-where-it-appears) ·
-[The course card](#the-course-card) · [The course page](#the-course-page) ·
+[The course card](#the-course-card) · [The home page](#the-home-page) ·
+[The course page](#the-course-page) ·
 [Dates and times](#dates-and-times) ·
 [Prices](#prices-and-financial-aid) · [Registration](#registration) ·
 [Where it meets](#where-it-meets) · [Pictures](#pictures) ·
@@ -55,11 +56,11 @@ registration closes or the course ends, ask your agent to change it.
 
 | Stage (as the site shows it) | Where it shows | Buttons |
 |---|---|---|
-| **Coming soon** | The Coming soon list on Programs and on its area page | Join the Interest List |
-| **Registration open** | The home page (up to three courses), Programs, and its area page | Register and Ask a Question |
+| **Coming soon** | The Coming soon list on Programs and on its area page; the home page only if you ask (see [The home page](#the-home-page)) | Join the Interest List |
+| **Registration open** | The home page (see [The home page](#the-home-page)), Programs, and its area page | Register and Ask a Question |
 | **No registration needed** | An open course anyone can just come to; the same places | Ask a Question |
 | **Ongoing series** | Already started, still taking people; after the open courses | Register and Ask a Question |
-| **Registration closed** | Still running, no longer taking people; the Registration closed list | Join the Interest List |
+| **Registration closed** | Still running, no longer taking people; the Registration closed list, and the home page when there is room | Join the Interest List |
 | **Program completed** | Finished; moves to Past Programs. The page stays as a record, and shared links keep working | Join the Interest List |
 
 **Tell your agent:**
@@ -104,7 +105,7 @@ first, then ongoing ones, newest start first.
 
 1. **The group**, with how many courses it holds. *Automatic*
 2. **A course card.** Programs shows every current course; the home page
-   shows the first three.
+   shows up to three (see [The home page](#the-home-page)).
 
 Courses that are coming soon or have closed registration appear as one line
 each, with their dates:
@@ -114,6 +115,30 @@ each, with their dates:
 3. **Coming soon.** Title, area, and dates, or your own card lines (here
    “2 years · Starts 2027”).
 4. **Registration closed.** Title, area, dates, and how many sessions.
+
+## The home page
+
+The home page shows up to three course cards, chosen in this order:
+
+1. Courses you have asked to always show on the home page, whatever their
+   stage.
+2. Then courses with registration open, then ongoing series, then courses
+   whose registration has closed, newest start first.
+
+A Coming soon course appears there only when you ask for it. You can also
+keep a course off the home page; it still appears on Programs and its area
+page. A course leaves the home page by itself when it is completed. If more
+courses are set to always show than there is room for, the **build** check
+fails and names them. How many courses the home page shows is a site setting
+the administrator changes.
+
+**Tell your agent:**
+
+- “Always show [course name] on the home page.”
+- “Keep [course name] off the home page.”
+- “Let the home page choose for [course name] again.”
+
+> Your agent’s word: `home`.
 
 ## The course page
 
@@ -432,6 +457,7 @@ word.
 | Cancel or move a session | “There is no class on [date].” · “The [date] session moves to [new date], same time.” |
 | Change the place | “[Course name] now meets in [room] at [place].” A new place needs its address once, for the map link. |
 | Hide a course for now | “Keep [course name] off the site until we announce it.” Everything stays saved; nothing shows. |
+| The home page | “Always show [course name] on the home page.” · “Keep [course name] off the home page.” See [The home page](#the-home-page). |
 | A Youth & Children series | When a Summer Garden or Camp Futuwwah ends: “Add this year’s Camp Futuwwah to its series on the Youth & Children page.” This changes the page itself, so it is a structural change (see [Checking a change](#checking-a-change)). |
 | Add a past course | “Add this old flyer to Past Programs.” The agent takes the dates from the flyer. If the flyer shows no year and no weekday, the page shows only the year. |
 
@@ -609,6 +635,7 @@ work, these are the names it uses.
 | Instructors, What to expect, Policies | `instructors` `expect` `policies` |
 | Longer write-up (Program details) | the course’s body text |
 | Course picture, flyer | `image` `flyer` |
+| Always or never on the home page | `home` |
 | Hidden for now | `draft` |
 
 The pictures in this guide are screenshots of the website’s own pages. The

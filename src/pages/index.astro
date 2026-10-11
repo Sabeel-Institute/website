@@ -11,9 +11,9 @@ import SabeelDifference from '../components/SabeelDifference.astro';
 import Gallery from '../components/Gallery.astro';
 import teacherPhoto from '../assets/photos/team-hero.webp';
 import servicePhoto from '../assets/photos/about-hero.webp';
-import { getCurrentPrograms, getGalleryPhotos } from '../lib/content';
+import { getGalleryPhotos, getHomePrograms } from '../lib/content';
 
-const featured = (await getCurrentPrograms()).slice(0, 3);
+const featured = await getHomePrograms();
 const gallery = await getGalleryPhotos();
 ---
 

@@ -46,6 +46,7 @@ field, including a field the schema does not have.
 |---|---|
 | Announce, open, close, or end a program | Set its `status` (see Status). Listings update themselves |
 | Keep a program off the site for now | Programs → Recipes → Keep a program off the site |
+| Put a program on the home page, or keep it off | Programs → Home page |
 | Add a program | Programs → Recipes → Add a program |
 | New session of a monthly gathering | Programs → Recipes → Recurring gathering |
 | When a program meets: dates, days, times | Programs → Schedule |
@@ -64,9 +65,9 @@ field, including a field the schema does not have.
 | Rename or move a page | Pages and components → Moving or removing a page |
 
 The home page, Programs, the area pages, and Past Programs list programs from
-each program's `status`. Never edit those pages to add, move, or remove a
-program; the one exception is the series of past programs on Youth & Children
-(see Areas).
+each program's `status`, and the home page also from its `home` (see Home
+page). Never edit those pages to add, move, or remove a program; the one
+exception is the series of past programs on Youth & Children (see Areas).
 
 ## How the site is put together
 
@@ -168,18 +169,17 @@ stateDiagram-v2
 
 | `status` | Use when | Shown as | Listed on | Its page offers |
 |---|---|---|---|---|
-| `open` | People can join: registration is open, or none is needed | Registration open, or No registration needed | Home, Programs, its area page | Register buttons, unless no registration is needed (see Registration) |
+| `open` | People can join: registration is open, or none is needed | Registration open, or No registration needed | Home (see Home page), Programs, its area page | Register buttons, unless no registration is needed (see Registration) |
 | `ongoing` | A series has begun and people can still join | Ongoing series | Same places, after open programs | The same as `open` |
-| `closed` | Registration has closed; the program is still running | Registration closed | “Registration closed” on Programs and its area page | Join the Interest List |
-| `upcoming` | Announced; registration is not open yet | Coming soon | “Coming soon” on Programs and its area page | Join the Interest List |
+| `closed` | Registration has closed; the program is still running | Registration closed | “Registration closed” on Programs and its area page; Home when there is room (see Home page) | Join the Interest List |
+| `upcoming` | Announced; registration is not open yet | Coming soon | “Coming soon” on Programs and its area page; Home only with `home: always` | Join the Interest List |
 | `completed` | The program has ended | Program completed | Past Programs | Join the Interest List; kept as a record |
 
 Current programs (open and ongoing) are listed open before ongoing, latest
-start date first; the home page shows the first three. When registration
-closes before a program ends, change only `status` to `closed`; when a program
-ends, change `status` to `completed` (and end a repeat that has no end; see
-Recipes). Keep every other field: the page stays up, its registration
-buttons go, and shared links keep working.
+start date first. When registration closes before a program ends, change only
+`status` to `closed`; when a program ends, change `status` to `completed` (and
+end a repeat that has no end; see Recipes). Keep every other field: the page
+stays up, its registration buttons go, and shared links keep working.
 
 ### Format and location
 
@@ -285,6 +285,21 @@ card:
 The build cannot check `card` against the schedule, so keep it for the odd
 long case.
 
+### Home page
+
+The home page shows up to three programs (`homeProgramCount` in
+`src/site.config.ts`), in this order:
+
+1. Programs with `home: always`, whatever their status.
+2. The other open programs, then ongoing, then closed ones, each latest start
+   date first.
+
+`home: never` keeps a program off the home page, and a coming-soon program is
+there only with `home: always`; either way it stays on Programs and its area
+page. A program leaves the home page when it is completed, so `home` can stay
+on it. The build stops, naming them, if more programs have `home: always` than
+the home page shows.
+
 ### Standard and bespoke pages
 
 Every program gets a page in one of two ways:
@@ -355,6 +370,7 @@ optional. The build stops on a field that is not in this table, naming it.
 | `image`, `imageAlt` | The program image, 16:9 (see Program images); alt text required with it | `./image.webp` |
 | `flyer` | Original flyer, US Letter portrait (see Program images) | `./flyer.webp` |
 | `page` | Bespoke page path | `/hikam-foundations/` |
+| `home` | `always` puts the program on the home page ahead of the others until it is completed; `never` keeps it off. Without it, the home page chooses (see Home page) | `always` |
 | `draft` | `true` keeps the program in the repository but off the site: no page, no listing | |
 
 `audience`, `location`, `fee`, and `deadline` are one line, or a list of
@@ -471,7 +487,7 @@ The form's name is all the site needs; do not add Zeffy's embed code (its
 4. Write the Markdown body, or delete it if there is nothing beyond the
    fields.
 5. Run `npm run build`, then check the program page, Programs, its area page,
-   and (for an open program) the home page in `npm run dev`.
+   and the home page in `npm run dev`.
 
 **Close registration early.** When registration closes while the program is
 still running, change only `status` to `closed`.
@@ -675,8 +691,9 @@ with permission from the people in them, and from the parents of children.
 
 Contact and finance emails (`email`, and `financeEmail` for financial aid
 questions and larger gifts), location, social links, financial-aid form, the
-Zeffy donation campaign, tax ID, `mailingListAction`, program areas, and the
-header (`mainNav`) and footer (`footerNav`) menus. A header item's `menu`
+Zeffy donation campaign, tax ID, `mailingListAction`, how many programs the
+home page shows (`homeProgramCount`), program areas, and the header
+(`mainNav`) and footer (`footerNav`) menus. A header item's `menu`
 lists the links in its drop-down menu; Programs lists the program areas that
 have a page. Change a value here, never by typing it into a page.
 
@@ -742,12 +759,12 @@ the 404 page.
 
 Queries and helpers in `src/lib/content.ts`: `getCurrentPrograms(area?)`,
 `getUpcomingPrograms(area?)`, `getClosedPrograms(area?)`,
-`getCompletedPrograms(area?)`, `programHref`, `statusLabel` (a program's
-status as cards and pages show it), `STATUS_LABEL`, `programSchedule` (the
-schedule as cards and pages word it), `programLocation`, `firstDay`,
-`programYear`, `asLines`, `resolveInstructors`, `getGalleryPhotos`,
-`getTeamGroup`, `displayName`, `teamHasPage`, `excerpt`. `src/lib/schedule.ts`
-reads and words schedules.
+`getCompletedPrograms(area?)`, `getHomePrograms()` (see Home page),
+`programHref`, `statusLabel` (a program's status as cards and pages show it),
+`STATUS_LABEL`, `programSchedule` (the schedule as cards and pages word it),
+`programLocation`, `firstDay`, `programYear`, `asLines`, `resolveInstructors`,
+`getGalleryPhotos`, `getTeamGroup`, `displayName`, `teamHasPage`, `excerpt`.
+`src/lib/schedule.ts` reads and words schedules.
 
 **A new page** is a file in `src/pages/` wrapped in `BaseLayout`, opening with
 `PageHero`, with sections that open with `SectionHeading`, and ending with a
