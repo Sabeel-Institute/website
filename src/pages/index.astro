@@ -37,9 +37,14 @@ const gallery = await getGalleryPhotos();
     <div class="container-page">
       <SectionHeading eyebrow="Join us" title="Current programs" id="current-heading">
         <p>Explore current classes, gatherings, and programs for women, teens, and children.</p>
-        <a href="/programs/" class="link-arrow mt-3 font-semibold">
-          View all programs <Icon name="arrow-right" class="size-5" />
-        </a>
+        <p class="mt-3 flex flex-wrap gap-x-8 gap-y-2">
+          <a href="/programs/" class="link-arrow font-semibold">
+            View all programs <Icon name="arrow-right" class="size-5" />
+          </a>
+          <a href="/calendar/" class="link-arrow font-semibold">
+            See the calendar <Icon name="arrow-right" class="size-5" />
+          </a>
+        </p>
       </SectionHeading>
       {
         featured.length > 0 ? (

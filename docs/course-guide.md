@@ -7,7 +7,7 @@ want.
 **Contents:** [How it works](#how-it-works) ·
 [Stages](#a-courses-stage-decides-where-it-appears) ·
 [The course card](#the-course-card) · [The home page](#the-home-page) ·
-[The course page](#the-course-page) ·
+[The calendar](#the-calendar) · [The course page](#the-course-page) ·
 [Dates and times](#dates-and-times) ·
 [Prices](#prices-and-financial-aid) · [Registration](#registration) ·
 [Where it meets](#where-it-meets) · [Pictures](#pictures) ·
@@ -37,7 +37,7 @@ flowchart LR
   agent --> lists["Lists on Programs<br/>Coming soon, Registration closed"]
   agent --> past["Past Programs<br/>the flyer archive, by year"]
   agent --> share["Link previews<br/>WhatsApp, email"]
-  agent --> cal["A future calendar<br/>the dates are stored ready for one"]
+  agent --> cal["The calendar<br/>each session, this month and next"]
 ```
 
 > **Good to know:** the website calls courses **programs** (the Programs
@@ -62,6 +62,9 @@ registration closes or the course ends, ask your agent to change it.
 | **Ongoing series** | Already started, still taking people; after the open courses | Register and Ask a Question |
 | **Registration closed** | Still running, no longer taking people; the Registration closed list, and the home page when there is room | Join the Interest List |
 | **Program completed** | Finished; moves to Past Programs. The page stays as a record, and shared links keep working | Join the Interest List |
+
+At every stage but Program completed, the course’s sessions are also on the
+calendar (see [The calendar](#the-calendar)).
 
 **Tell your agent:**
 
@@ -141,6 +144,37 @@ the administrator changes.
 - “Let the home page choose for [course name] again.”
 
 > Your agent’s words: `home`, and `homePriority` for the order.
+
+## The calendar
+
+The Calendar page (the last link in the Programs menu) shows this month and
+the next, with every session of every course that has dates, at every stage
+but Program completed. Each session sits on its day and opens the course page
+when chosen. On a computer, pointing at a session shows its details; on a
+phone, a small month sits above a list of the month’s sessions, and tapping a
+day goes to its sessions.
+
+<img src="course-guide/calendar.webp" width="760" alt="The calendar for October 2026 with numbered markers: the month and its arrows, the area buttons, today’s date, a session, and the details of a session pointed at.">
+
+1. **The month,** with how many sessions it has. The arrows go to next month
+   and back. *Automatic*
+2. **Areas.** Each area has its own colour; choose one to hide or show its
+   sessions. *Automatic*
+3. **Today.** Earlier days are paler. *Automatic*
+4. **A session:** its start time and the course title, from the course’s
+   dates. *Automatic*
+5. **Its details:** area and stage, date, time, place, and who it’s for.
+   *Automatic*
+
+There is nothing to ask for: a course appears on the calendar as soon as it
+has dates, and moves or leaves when its dates or stage change. A course whose
+dates are not decided yet (only a year) is not on it. Your own wording for a
+part of the schedule, such as “Monthly” or “Book club”, shows with its time.
+
+**Tell your agent,** to change a session there:
+
+- “There is no [course name] class on [date].”
+- “The [date] session of [course name] moves to [new date], same time.”
 
 ## The course page
 
@@ -297,8 +331,8 @@ changed page.
 
 Tell your agent the dates the way you would tell a person. The site then
 writes them the same way on the card, the page, and the lists, works out how
-many sessions there are, and keeps them ready for a calendar later. Times
-are always Central time; the site adds “CT”.
+many sessions there are, and puts each session on the calendar. Times are
+always Central time; the site adds “CT”.
 
 Each example shows what you might say and what the card then shows. Examples
 marked “Example” are made up; the others are real courses.
@@ -592,8 +626,8 @@ Your agent sends each change for review (on GitHub this is a “pull
 request”). A few minutes later a comment appears on it with two links:
 
 - **Preview:** the whole website with your change in it. Open the course
-  page, its card on Programs, and the home page, and look at it on your phone
-  too.
+  page, its card on Programs, the home page, and the calendar, and look at it
+  on your phone too.
 - **Visual changes:** before-and-after pictures of every page that looks
   different. Check that only the pages you expected changed.
 
