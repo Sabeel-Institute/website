@@ -121,7 +121,8 @@ each, with their dates:
 The home page shows up to three course cards, chosen in this order:
 
 1. Courses you have asked to always show on the home page, whatever their
-   stage.
+   stage. When there are several, you can set their order with a number from
+   0 to 100: the highest comes first.
 2. Then courses with registration open, then ongoing series, then courses
    whose registration has closed, newest start first.
 
@@ -136,9 +137,10 @@ the administrator changes.
 
 - “Always show [course name] on the home page.”
 - “Keep [course name] off the home page.”
+- “Show [course name] first among the courses that always show.”
 - “Let the home page choose for [course name] again.”
 
-> Your agent’s word: `home`.
+> Your agent’s words: `home`, and `homePriority` for the order.
 
 ## The course page
 
@@ -457,7 +459,7 @@ word.
 | Cancel or move a session | “There is no class on [date].” · “The [date] session moves to [new date], same time.” |
 | Change the place | “[Course name] now meets in [room] at [place].” A new place needs its address once, for the map link. |
 | Hide a course for now | “Keep [course name] off the site until we announce it.” Everything stays saved; nothing shows. |
-| The home page | “Always show [course name] on the home page.” · “Keep [course name] off the home page.” See [The home page](#the-home-page). |
+| The home page | “Always show [course name] on the home page.” · “Keep [course name] off the home page.” · “Show [course name] first among the courses that always show.” See [The home page](#the-home-page). |
 | A Youth & Children series | When a Summer Garden or Camp Futuwwah ends: “Add this year’s Camp Futuwwah to its series on the Youth & Children page.” This changes the page itself, so it is a structural change (see [Checking a change](#checking-a-change)). |
 | Add a past course | “Add this old flyer to Past Programs.” The agent takes the dates from the flyer. If the flyer shows no year and no weekday, the page shows only the year. |
 
@@ -636,6 +638,7 @@ work, these are the names it uses.
 | Longer write-up (Program details) | the course’s body text |
 | Course picture, flyer | `image` `flyer` |
 | Always or never on the home page | `home` |
+| Order of the courses that always show | `homePriority` |
 | Hidden for now | `draft` |
 
 The pictures in this guide are screenshots of the website’s own pages. The

@@ -4,11 +4,12 @@
 
 - The program schema (`src/content.config.ts`) types only what the site acts
   on: `status`, `area`, `format`, the schedule, `registration`,
-  `financialAid`, `page`, `home`, venues, and instructors; what people only
-  read (`audience`, `location`, `fee`, `deadline`, `highlight`, `card`) is free
-  text, one line or a list. Its `superRefine` requires `schedule` or `date`
-  (not both), `summary` until a program is completed, and `format` while it
-  is open or ongoing. The program object, a schedule part, an inline guest
+  `financialAid`, `page`, `home`, `homePriority`, venues, and instructors;
+  what people only read (`audience`, `location`, `fee`, `deadline`,
+  `highlight`, `card`) is free text, one line or a list. Its `superRefine`
+  requires `schedule` or `date` (not both), `summary` until a program is
+  completed, `format` while it is open or ongoing, and `home: always` with
+  `homePriority`. The program object, a schedule part, an inline guest
   instructor, and the team, venue, testimonial, and gallery photo schemas
   are strict, so a field the schema lacks fails the build (named by
   `unknownField`) instead of being dropped. The `file()` loader keeps each
@@ -74,7 +75,7 @@
   cannot count them. Completed and draft programs are not counted, so a pin
   can stay on a program that has ended. It orders programs with `byStatus`,
   the order of current programs, which places closed and coming-soon ones
-  after them.
+  after them, and pinned programs by `homePriority` before that.
 - `src/assets/images/logo.png` is `sabeel-logo.png` from the brand
   repository (`skills/sabeel-brand/logo/`), scaled to 1600 px wide.
   `public/icon-*.png` are its `sabeel-icon.png` design: the calligraphy

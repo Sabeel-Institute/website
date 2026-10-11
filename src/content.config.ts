@@ -22,6 +22,9 @@ const PROGRAM_STATUSES = ['open', 'ongoing', 'closed', 'upcoming', 'completed'] 
 const RESERVED_SLUGS = new Set(['womens-learning', 'youth-children']);
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+/** One message for every way a homePriority can be wrong: not a number, a fraction, or out of range. */
+const homePriorityError = 'homePriority is a whole number from 0 to 100';
+
 /** Names a field the schema lacks, so a misspelt field fails the build instead of being dropped. */
 const unknownField = (what: string) => ({
   error: (issue: { code?: string; keys?: string[] }) =>
@@ -187,6 +190,13 @@ const programs = defineCollection({
         flyer: image().optional(),
         /** always puts the program on the home page, ahead of the others, until it is completed; never keeps it off. */
         home: z.enum(['always', 'never']).optional(),
+        /** With home: always, its place among those programs: highest first; without it, 0. */
+        homePriority: z
+          .number(homePriorityError)
+          .int(homePriorityError)
+          .min(0, homePriorityError)
+          .max(100, homePriorityError)
+          .optional(),
         /** true keeps the program in the repository but off the site: no page and no listing. */
         draft: z.boolean().optional(),
         /**
@@ -205,6 +215,9 @@ const programs = defineCollection({
         if (d.schedule && d.date) issue('date', 'a program with a schedule takes its date from it: remove date');
         if (d.status !== 'completed' && !d.summary) issue('summary', 'summary is required until the program is completed');
         if ((d.status === 'open' || d.status === 'ongoing') && !d.format) issue('format', 'format is required while people can join: it decides where the program is listed');
+        if (d.homePriority !== undefined && d.home !== 'always') {
+          issue('homePriority', 'homePriority orders the programs with home: always: add home: always, or remove homePriority');
+        }
         if (d.status === 'completed' && d.schedule?.some(repeatsForever)) {
           issue('schedule', 'a completed program\'s schedule ends: give its repeat COUNT or UNTIL, or keep only the first session');
         }
