@@ -46,6 +46,8 @@ export const site = {
    */
   mailingListAction:
     'https://sameerainstitute.us5.list-manage.com/subscribe/post?u=6a6627c0893dce014d27d385b&id=6e808d03f1&f_id=00cd47edf0' as string | null,
+  /** How many programs the home page shows (see Home page in AGENTS.md). Its cards sit three to a row. */
+  homeProgramCount: 3,
 } as const;
 
 export type AreaId = (typeof PROGRAM_AREAS)[number];
