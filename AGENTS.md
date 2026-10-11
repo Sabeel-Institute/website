@@ -290,9 +290,17 @@ long case.
 The home page shows up to three programs (`homeProgramCount` in
 `src/site.config.ts`), in this order:
 
-1. Programs with `home: always`, whatever their status.
+1. Programs with `home: always`, whatever their status, highest
+   `homePriority` first: a whole number from 0 to 100, or 0 without one.
+   Pinned programs with the same priority come open, ongoing, closed, then
+   coming soon, each latest start date first.
 2. The other open programs, then ongoing, then closed ones, each latest start
    date first.
+
+```yaml
+home: always
+homePriority: 90
+```
 
 `home: never` keeps a program off the home page, and a coming-soon program is
 there only with `home: always`; either way it stays on Programs and its area
@@ -371,6 +379,7 @@ optional. The build stops on a field that is not in this table, naming it.
 | `flyer` | Original flyer, US Letter portrait (see Program images) | `./flyer.webp` |
 | `page` | Bespoke page path | `/hikam-foundations/` |
 | `home` | `always` puts the program on the home page ahead of the others until it is completed; `never` keeps it off. Without it, the home page chooses (see Home page) | `always` |
+| `homePriority` | Only with `home: always`: its place among those programs, a whole number from 0 to 100, highest first; 0 without it (see Home page) | `90` |
 | `draft` | `true` keeps the program in the repository but off the site: no page, no listing | |
 
 `audience`, `location`, `fee`, and `deadline` are one line, or a list of

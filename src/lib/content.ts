@@ -37,13 +37,16 @@ export async function getCurrentPrograms(area?: AreaId): Promise<Program[]> {
 
 /**
  * The home page's programs, up to `site.homeProgramCount`: those with
- * `home: always` first, then open, ongoing, and closed ones without `home`.
- * Fails the build when more are pinned than fit (see Home page in AGENTS.md).
+ * `home: always` first, highest `homePriority` first, then open, ongoing, and
+ * closed ones without `home`. Fails the build when more are pinned than fit
+ * (see Home page in AGENTS.md).
  */
 export async function getHomePrograms(): Promise<Program[]> {
   const count = site.homeProgramCount;
   const list = (await withStatus(['open', 'ongoing', 'closed', 'upcoming'])).sort(byStatus);
-  const pinned = list.filter((p) => p.data.home === 'always');
+  const pinned = list
+    .filter((p) => p.data.home === 'always')
+    .sort((a, b) => (b.data.homePriority ?? 0) - (a.data.homePriority ?? 0) || byStatus(a, b));
   if (pinned.length > count) {
     throw new Error(
       `${pinned.length} programs have home: always (${pinned.map((p) => p.id).join(', ')}), but the home page ` +
