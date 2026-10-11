@@ -3,7 +3,8 @@
  * and optionally a time, a repeat rule in the iCalendar (RRULE) form that
  * calendar apps use, dates to skip, or a last day for one continuous
  * multi-day event. The content schema checks parts with `checkPart`; cards
- * and pages word them with `describeSchedule`.
+ * and pages word them with `describeSchedule`, and the calendar lists their
+ * days with `meetings`.
  *
  * Days are calendar days held as UTC midnight, as `z.coerce.date()` reads
  * `YYYY-MM-DD`; times are Central wall-clock times, so no time-zone
@@ -288,6 +289,55 @@ function partTime(x: Expanded): string {
   const a = clock(x.time.from);
   const b = clock(x.time.to);
   return `${DAYS_SHORT[x.dates[0]!.getUTCDay()]} ${a.text} ${a.ap} – ${DAYS_SHORT[x.last!.getUTCDay()]} ${b.text} ${b.ap} CT`;
+}
+
+/* ---------- Calendar ---------- */
+
+/** One day a part meets on, as the calendar shows it. */
+export type Meeting = {
+  day: Date;
+  /** Minutes after midnight it starts that day; undefined on a day without a set time. */
+  starts?: number;
+  /** That day's time, short: "7:00 PM"; on a multi-day event, "Until 2:00 PM" on its last day and "All day" between. */
+  short?: string;
+  /** The part's whole time: "7:00–8:00 PM CT", "Fri 4:00 PM – Sun 2:00 PM CT". */
+  time?: string;
+};
+
+/**
+ * The days a part meets on from `from` to `to`, both included: its sessions,
+ * or each day of a multi-day event. An endless rule is followed up to `to`.
+ */
+export function meetings(part: SchedulePart, from: Date, to: Date): Meeting[] {
+  const x = expand(part);
+  const time = partTime(x) || undefined;
+  const t = x.time;
+  const short = (minutes: number) => {
+    const c = clock(minutes);
+    return `${c.text} ${c.ap}`;
+  };
+  if (x.kind === 'span') {
+    const days: Meeting[] = [];
+    for (let d = Math.max(+part.start, +from); d <= Math.min(+part.end!, +to); d += DAY_MS) {
+      const day = new Date(d);
+      if (t && d === +part.start) days.push({ day, starts: t.from, short: short(t.from), time });
+      // The last day of a timed event runs from midnight until its end time.
+      else if (t?.to !== undefined && d === +part.end!) days.push({ day, starts: 0, short: `Until ${short(t.to)}`, time });
+      else days.push({ day, short: 'All day', time });
+    }
+    return days;
+  }
+  const at = (day: Date): Meeting => ({ day, starts: t?.from, short: t && short(t.from), time });
+  if (!x.recur) return part.start >= from && part.start <= to ? [at(part.start)] : [];
+  const skip = new Set((part.skip ?? []).map(iso));
+  const it = x.recur.iterator(ICAL.Time.fromDateString(iso(part.start)));
+  const days: Meeting[] = [];
+  for (let next = it.next(); next; next = it.next()) {
+    const d = fromIcal(next);
+    if (d > to) break;
+    if (d >= from && !skip.has(iso(d))) days.push(at(d));
+  }
+  return days;
 }
 
 export type ScheduleText = {
