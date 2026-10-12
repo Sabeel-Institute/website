@@ -18,7 +18,6 @@ fee:
 financialAid: false
 registration:
   zeffy: anchored-hearts-sisters-circle
-deadline: Optional activity — register by Wednesday, October 7
 instructors:
   - name: Dr. Sabeen Najam
     role: This month’s speaker
