@@ -7,8 +7,12 @@ area: youth-children
 schedule:
   - start: 2026-11-01
     time: 2:30–4:30 PM
-    repeat: FREQ=WEEKLY;COUNT=2
-audience: Children ages 5–10
+  - start: 2026-11-08
+    time: 2:30–4:30 PM
+card:
+  - Nov 01 and Nov 08
+  - Sundays · 2:30–4:30 PM CT
+audience: Children 6–10 years old
 format: On-site
 venue: masjid-istiqlal
 location: Sabeel Classroom at Masjid Istiqlal
