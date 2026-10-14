@@ -36,3 +36,9 @@ Anchored Hearts is a monthly gathering for sisters to learn, reflect, and connec
 **Friday, October 16, with Dr. Sabeen Najam.** Discover how to keep your faith strong and your heart grounded in a world where faith is increasingly challenged.
 
 The halaqa is open to all sisters. We start with an optional creative activity with Sr. Hira Jeddy from House of Makers — get creative and enjoy an evening of jewelry-making, snacks, and sisterhood.
+
+### Schedule
+
+- **5:30–6:45 PM** – Optional Jewellery Activity with House of Makers
+- **6:50–7:00 PM** – Maghrib Prayer
+- **7:00–7:45 PM** – Halaqa (*Begins right after Maghrib*)
