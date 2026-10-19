@@ -2,7 +2,7 @@ import type { ImageMetadata } from 'astro';
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { satteri } from '@astrojs/markdown-satteri';
 import { site, type AreaId } from '../site.config';
-import { describeSchedule, type ScheduleText } from './schedule';
+import { describeSchedule, meetings, type Meeting, type ScheduleText } from './schedule';
 
 export type Program = CollectionEntry<'programs'>;
 export type TeamMember = CollectionEntry<'team'>;
@@ -213,6 +213,53 @@ export function assertProgramImages(programs: Program[]): void {
       );
     }
   }
+}
+
+/* ---------- Calendar ---------- */
+
+/** A day a program meets, as the calendar shows it. */
+export type Session = Meeting & {
+  program: Program;
+  /** Its schedule part's own words ("Book club", "Monthly"). */
+  label?: string;
+  /** Where it meets: its part's own venue, or the program's `location`, or its `venue`. */
+  place?: string;
+};
+
+/**
+ * How many months the calendar is built with, from the month the site is
+ * built in. Visitors see their own month and the next (see Calendar in
+ * AGENTS.md), so the last one covers a month that begins before the next
+ * build.
+ */
+const CALENDAR_MONTHS = 3;
+
+/**
+ * The calendar's months, each as its first day, from this month in Houston;
+ * and every session in them of the programs on the site that are not
+ * completed, in order of day and time. Programs with only `date` have none.
+ */
+export async function getCalendar(): Promise<{ months: Date[]; sessions: Session[] }> {
+  const [year, month] = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit' })
+    .format(new Date())
+    .split('-')
+    .map(Number);
+  const months = Array.from({ length: CALENDAR_MONTHS }, (_, i) => new Date(Date.UTC(year!, month! - 1 + i, 1)));
+  const from = months[0]!;
+  const to = new Date(Date.UTC(year!, month! - 1 + CALENDAR_MONTHS, 0));
+  const venues = new Map((await getCollection('venues')).map((v) => [v.id, v.data.name]));
+  const programs = await withStatus(['open', 'ongoing', 'closed', 'upcoming']);
+  const sessions = programs.flatMap((program) => {
+    const { location, venue, schedule } = program.data;
+    // A part without its own venue meets where the program does.
+    const where = location ? asLines(location).join(' · ') : [venue ?? []].flat().map((v) => venues.get(v.id)).join(' and ') || undefined;
+    return (schedule ?? []).flatMap((part) =>
+      meetings(part, from, to).map((m) => ({ ...m, program, label: part.label, place: part.venue ? venues.get(part.venue.id) : where })),
+    );
+  });
+  const order = (a: Session, b: Session) =>
+    +a.day - +b.day || (a.starts ?? -1) - (b.starts ?? -1) || a.program.data.title.localeCompare(b.program.data.title);
+  return { months, sessions: sessions.sort(order) };
 }
 
 /* ---------- Gallery ---------- */

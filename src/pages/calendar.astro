@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import EventCalendar from '../components/EventCalendar.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { getCalendar } from '../lib/content';
+
+const { months, sessions } = await getCalendar();
+---
+
+<BaseLayout
+  title="Calendar"
+  description="Every session of Sabeel Institute’s current classes, gatherings, and programs, this month and next."
+>
+  <PageHero eyebrow="Calendar" title="What’s on at Sabeel.">
+    <p>
+      Every session of our current classes, gatherings, and programs, this month and next. Choose one to open its
+      program’s page.
+    </p>
+  </PageHero>
+
+  <section class="py-14 md:py-16">
+    <div class="container-page">
+      <EventCalendar months={months} sessions={sessions} />
+    </div>
+  </section>
+
+  <CtaBand title="Not seeing the right program?">
+    <p>Browse every current program, or join the interest list to hear when new ones open.</p>
+    <a slot="actions" href="/programs/" class="btn btn-primary px-7 text-base">View All Programs</a>
+    <a slot="actions" href="/contact/?inquiry=interest-list" data-interest class="btn btn-outline px-7 text-base">
+      Join the Interest List
+    </a>
+  </CtaBand>
+</BaseLayout>
