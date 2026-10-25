@@ -1,5 +1,5 @@
 ---
-status: open
+status: completed
 title: Mommy Burnout
 subtitle: A Journey from Burnout to Barakah
 summary: Our flagship seven-session course helps mothers step out of survival mode, rooted in Qur’anic guidance, Prophetic wisdom, and practical insights from psychology.
