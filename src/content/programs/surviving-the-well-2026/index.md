@@ -9,6 +9,8 @@ schedule:
   - start: 2026-11-07
     time: 12:30–1:45 PM
     repeat: FREQ=WEEKLY;INTERVAL=2;BYDAY=SA;COUNT=4
+registration:
+  zeffy: surviving-the-well-a-surah-yusuf-series-for-women
 audience: Adult women
 format: Online & on-site
 venue: masjid-istiqlal
