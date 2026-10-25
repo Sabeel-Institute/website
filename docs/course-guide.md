@@ -198,12 +198,13 @@ page.
 ### About this program
 
 The middle of the page takes one of three layouts, chosen automatically from
-what the course has.
+what the course has. The flyer has no separate heading or caption; click the
+flyer or “Enlarge” to open a larger version.
 
 **1. With points for “What students will learn”.** The writing leads, and
 the flyer stays beside it as the reader scrolls:
 
-![The About this program section of Mommy Burnout: What students will learn, an Instructors card, a What to expect card, the start of Program details, and the original flyer beside them.](course-guide/about-text.webp)
+![The About this program section of Mommy Burnout: What students will learn, an Instructors card, a What to expect card, the start of Program details, and the flyer beside them.](course-guide/about-text.webp)
 
 1. **What students will learn.** Three to five short points. *Optional*
 2. **Instructor card.** See [the cards](#the-cards) below. *Optional*
@@ -211,7 +212,7 @@ the flyer stays beside it as the reader scrolls:
 4. **Program details.** Your longer write-up, as long as you like, with
    headings, bullet points, bold, and links. Good for a session-by-session
    list, “This course may be for you if…”, or speaker bios. *Optional*
-5. **Original flyer.** Click to enlarge. *Optional*
+5. **Flyer.** Click to enlarge. *Optional*
 
 **2. With a longer write-up but no points.** The write-up leads under the
 heading “What to know”, then the cards, with the flyer beside them:
@@ -221,13 +222,13 @@ heading “What to know”, then the cards, with the flyer beside them:
 1. **What to know.** The longer write-up, with all its formatting.
 2. **Instructor card.** *Optional*
 3. **What to expect card.** *Optional*
-4. **Original flyer.** *Optional*
+4. **Flyer.** Click to enlarge. *Optional*
 
 **3. With neither.** The flyer leads, and the cards sit beside it:
 
-![The About this program section of the investing workshop: the original flyer large on the left, with Instructor and What to expect cards beside it.](course-guide/about-flyer.webp)
+![The About this program section of the investing workshop: the flyer large on the left, with Instructor and What to expect cards beside it.](course-guide/about-flyer.webp)
 
-1. **Original flyer**, large.
+1. **Flyer**, large. Click to enlarge.
 2. **Instructor card.** *Optional*
 3. **What to expect card.** *Optional*
 
