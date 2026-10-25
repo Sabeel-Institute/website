@@ -1,6 +1,8 @@
 ---
 status: open
 flyer: ./flyer.webp
+image: ./image.webp
+imageAlt: "Surviving the Well: A Surah Yusuf Series for Women"
 title: "Surviving the Well"
 subtitle: "A Surah Yusuf Series for Women"
 summary: A 4-part journey through Surah Yusuf for women, drawing actionable spiritual tools from "The Best of Stories" to heal, remain steadfast, and cultivate beautiful patience.
@@ -9,10 +11,15 @@ schedule:
   - start: 2026-11-07
     time: 12:30–1:45 PM
     repeat: FREQ=WEEKLY;INTERVAL=2;BYDAY=SA;COUNT=4
+card:
+  - Nov 07, Nov 21, Dec 05 and Dec 19
+  - Every other Saturday · 12:30–1:45 PM CT
 audience: Adult women
 format: Online & on-site
 venue: masjid-istiqlal
 location: Sabeel Classroom at Masjid Istiqlal or online via Zoom
+registration:
+  zeffy: surviving-the-well-a-surah-yusuf-series-for-women
 instructors:
   - mariam-sattar
 ---
