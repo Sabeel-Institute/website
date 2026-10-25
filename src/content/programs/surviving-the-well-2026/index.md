@@ -1,5 +1,6 @@
 ---
 status: open
+flyer: ./flyer.webp
 title: "Surviving the Well"
 subtitle: "A Surah Yusuf Series for Women"
 summary: A 4-part journey through Surah Yusuf for women, drawing actionable spiritual tools from "The Best of Stories" to heal, remain steadfast, and cultivate beautiful patience.
