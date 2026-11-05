@@ -1,5 +1,5 @@
 ---
-status: open
+status: completed
 title: Introduction to Stocks & Investments – The Halal Way
 subtitle: Let’s Invest Your First $50
 summary: A beginner-friendly, sisters-only workshop exploring the basics of stocks and investing through a halal and ethical lens.
