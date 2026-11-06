@@ -5,21 +5,21 @@ subtitle: A Waldorf-Inspired Children’s Program
 summary: A journey through folktales from around the world combining Waldorf-inspired learning with Islamic teachings to nurture creativity, cultivate beautiful character (akhlaq), and strengthen connection with Allah (SWT).
 area: youth-children
 schedule:
-  - start: 2025-11-21
+  - start: 2026-11-21
     time: 3:30–5:30 PM
-  - start: 2025-12-05
+  - start: 2026-12-05
     time: 3:30–5:30 PM
-  - start: 2025-12-19
+  - start: 2026-12-19
     time: 3:30–5:30 PM
-  - start: 2026-01-02
+  - start: 2027-01-02
     time: 3:30–5:30 PM
-  - start: 2026-01-16
+  - start: 2027-01-16
     time: 3:30–5:30 PM
-  - start: 2026-01-30
+  - start: 2027-01-30
     time: 3:30–5:30 PM
 card:
   - Nov 21 – Jan 30 · 6 sessions
-  - Bi-weekly Fridays · 3:30–5:30 PM CT
+  - Bi-weekly Saturdays · 3:30–5:30 PM CT
 audience: Ages 5–9 years old
 format: On-site
 venue: masjid-istiqlal
