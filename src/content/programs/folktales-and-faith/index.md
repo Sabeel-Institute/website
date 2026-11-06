@@ -27,6 +27,8 @@ location: Sabeel Classroom at Masjid Istiqlal
 fee:
   - $20 / session
   - $100 for full series
+registration:
+  zeffy: sabeel-starlings-folktales-and-faith
 image: ./image.webp
 imageAlt: "Sabeel Starlings: Folktales and Faith title artwork with starry night and children under a tree"
 flyer: ./flyer.webp
