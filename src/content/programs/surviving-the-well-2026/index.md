@@ -18,6 +18,8 @@ audience: Adult women
 format: Online & on-site
 venue: masjid-istiqlal
 location: Sabeel Classroom at Masjid Istiqlal or online via Zoom
+fee: Free
+financialAid: false
 registration:
   zeffy: surviving-the-well-a-surah-yusuf-series-for-women
 instructors:
