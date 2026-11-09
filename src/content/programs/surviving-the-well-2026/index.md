@@ -11,9 +11,6 @@ schedule:
   - start: 2026-11-07
     time: 12:30–1:45 PM
     repeat: FREQ=WEEKLY;INTERVAL=2;BYDAY=SA;COUNT=4
-card:
-  - Nov 07, Nov 21, Dec 05 and Dec 19
-  - Every other Saturday · 12:30–1:45 PM CT
 audience: Adult women
 format: Online & on-site
 venue: masjid-istiqlal

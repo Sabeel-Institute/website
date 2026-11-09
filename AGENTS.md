@@ -34,11 +34,14 @@ npm ci            # install exact dependencies
 npm run dev       # live-reloading preview at http://localhost:4321
 npm run build     # type-check, validate all content, build to dist/
 npm run preview   # serve the built dist/
+npm run facts -- <folder>    # what a program's built page says
+npm run program-image -- <folder> <top> <bottom>  # image from its flyer
 ```
 
 `npm run build` must end with `0 errors`. It validates every content file
 against the schemas in `src/content.config.ts`, and errors name the file and
-field, including a field the schema does not have.
+field, including a field the schema does not have. Each error says what to
+change; change that, never the check.
 
 ## Everyday tasks
 
@@ -48,10 +51,11 @@ field, including a field the schema does not have.
 | Keep a program off the site for now | Programs → Recipes → Keep a program off the site |
 | Put a program on the home page, or keep it off | Programs → Home page |
 | Add a program | Programs → Recipes → Add a program |
+| Check a program change before the pull request | Programs → Recipes → Program checklist |
 | New session of a monthly gathering | Programs → Recipes → Recurring gathering |
 | When a program meets: dates, days, times | Programs → Schedule |
 | Prices, an early-bird price | Programs → Fields |
-| Images from the program's designers | Programs → Program images |
+| Images from the program's designers, or a program image from its flyer | Programs → Program images |
 | How people register: Zeffy, another site's form, or no registration | Programs → Registration |
 | Add, rename, or hide a person | Team |
 | Add a testimonial | Testimonials |
@@ -114,6 +118,7 @@ flowchart LR
 | `firebase.json` | Hosting settings, and redirects for moved pages and the old WordPress site's addresses |
 | `.github/workflows/` | Build and deploy (see docs/deployment.md) |
 | `scripts/visual-diff/` | Screenshot comparison of each pull request with `main` (see docs/deployment.md) |
+| `scripts/program-image.mjs`, `scripts/program-facts.mjs` | `npm run program-image` and `npm run facts` (see Programs) |
 
 ## Programs
 
@@ -177,9 +182,14 @@ stateDiagram-v2
 
 Current programs (open and ongoing) are listed open before ongoing, latest
 start date first. When registration closes before a program ends, change only
-`status` to `closed`; when a program ends, change `status` to `completed` (and
-end a repeat that has no end; see Recipes). Keep every other field: the page
-stays up, its registration buttons go, and shared links keep working.
+`status` to `closed`; when a program ends, after its last session, change
+`status` to `completed` (and end a repeat that has no end; see Recipes). Keep
+every other field: the page stays up, its registration buttons go, and shared
+links keep working.
+
+The build of a pull request stops on a program that is not `completed` and
+whose last session was more than 30 days ago, naming it: if it has ended, set
+it to `completed`; if not, its dates are in the wrong year.
 
 ### Format and location
 
@@ -235,12 +245,22 @@ the form calendar apps use (iCalendar RRULE):
 
 `start` is the first session, so it is a day the rule gives. `COUNT` is the
 number of sessions and `UNTIL` the last day (`YYYYMMDD`); use one of them, or
-neither for a gathering that continues. A rule uses only `FREQ` (`DAILY`,
-`WEEKLY`, `MONTHLY`), `INTERVAL`, `COUNT`, `UNTIL`, `BYDAY`, and
-`BYMONTHDAY`. The build stops on any other part, a `start` the rule does not
-give, a `skip` that is not one of its dates, or a completed program whose
-rule has no end. To move one session, skip it and add a part for the new
-day.
+neither for a gathering that continues. A weekly rule names its days in
+`BYDAY`, as the flyer prints them, so the build can check that `start` is one
+of them. A rule uses only `FREQ` (`DAILY`, `WEEKLY`, `MONTHLY`), `INTERVAL`,
+`COUNT`, `UNTIL`, `BYDAY`, and `BYMONTHDAY`. The build stops on any other
+part, a weekly rule without `BYDAY`, a `start` the rule does not give, a
+`skip` that is not one of its dates, or a completed program whose rule has no
+end. To move one session, skip it and add a part for the new day.
+
+Sessions that follow a pattern are one part with `repeat`, never a part per
+date: the build stops on two or more one-session parts with the same time a
+day, a week, or two weeks apart, and names the part to write instead.
+
+Dates are in the year the flyer or the organisation gives. When they give
+none, a new program's dates are the next ones after today: run `date` for
+today's date rather than assuming the year. Every date falls on the weekday
+the flyer prints; a weekly rule's `BYDAY` makes the build check it.
 
 Several parts describe a program in pieces: blocks of dates, different days
 at different times, two places, or activities on the same nights (an
@@ -264,26 +284,35 @@ guess. Pages then show only its year. A program has `schedule` or `date`,
 not both.
 
 Cards and pages word the schedule themselves: “Sept 14 – Oct 26 · 7
-sessions”, “Mondays · 12:00–1:30 PM CT”, “Last Wednesday of each month”.
-`label` adds your own words to a part's line.
+sessions”, “Mondays · 12:00–1:30 PM CT”, “Every other Saturday”, “Last
+Wednesday of each month”. Up to four sessions on separate days in one year
+are listed by date: “Nov 1 & Nov 8”, “Nov 7, Nov 21, Dec 5 & Dec 19”. `label`
+adds your own words to a part's line; nothing else changes the wording.
 
 ### Cards
 
 Every current program's card shows the same lines, in this order: audience;
-the dates (“Sept 14 – Oct 26 · 7 sessions”, “Saturday, Oct 24”); the days and
-time, one line per part of the schedule (“Mondays · 12:00–1:30 PM CT”); and
-format. When the dates and times are too long for a card, or say too little,
-`card` gives one or two lines of your own in their place, on the card and in
-the Coming soon and Registration closed lists on Programs:
+the dates (“Sept 14 – Oct 26 · 7 sessions”, “Nov 1 & Nov 8”, “Saturday, Oct
+24”); the days and time, one line per part of the schedule (“Mondays ·
+12:00–1:30 PM CT”); and format. They come from `schedule`, so to change them,
+change the schedule.
+
+A program without a schedule (only `date`) shows its year: “Starts 2027”.
+For such a program, `card` gives one or two lines of your own in its place,
+on the card and in the Coming soon and Registration closed lists on Programs:
 
 ```yaml
-card:
-  - July 25 – Aug 1 · two 4-day sessions
-  - 4:45–7:45 PM CT
+card: 2 years · Starts 2027
 ```
 
-The build cannot check `card` against the schedule, so keep it for the odd
-long case.
+The build stops on `card` in a program with a schedule.
+
+How dates and times are worded is the site's, the same for every program.
+When someone asks for one program's dates worded another way, keep its
+schedule as it is, tell them what the card and page show (from `npm run
+facts`), and say that changing the wording is a structural change for the
+admin (see Routine and structural changes). Never change `src/lib/` or the
+schema for one program.
 
 ### Home page
 
@@ -370,7 +399,7 @@ optional. The build stops on a field that is not in this table, naming it.
 | `registration` | How people join (see Registration): `none`, or on the line under it, `zeffy:` a Zeffy form or `link:` another site's form | `zeffy: anchored-hearts-sisters-circle` |
 | `deadline` | Registration deadline text | `Register by Wednesday, October 7` |
 | `highlight` | A short line above the Register button: an early-bird price, limited seats, a new date. Shown until registration closes | `Register by October 20 and save $5.` |
-| `card` | One or two lines a card, or a Programs list, shows in place of its dates and times; see Cards | `2 years · Starts 2027` |
+| `card` | Only without a schedule: one or two lines a card, or a Programs list, shows in place of its year; see Cards | `2 years · Starts 2027` |
 | `outcomes` | Three to five things students will learn (list) | |
 | `instructors` | Team file names and/or inline guests `{ name, role, highlights }` | `sameera-shah` |
 | `expect` | Teaching format, activities, participation, and anything to bring or know first; Markdown without headings (see below) | |
@@ -437,6 +466,34 @@ program image is not 16:9. Until a program has its own, its image can be a
 guidance is the `sabeel-flyers` skill in
 [Sabeel-Institute/brand](https://github.com/Sabeel-Institute/brand).
 
+To make the program image from the flyer, find where the flyer's title area
+starts and ends, in percent of the flyer's height from its top edge, and run
+from the repository root:
+
+```bash
+npm run program-image -- <folder> <top> <bottom> [centre]
+```
+
+The title area is the logo, title, and subtitle. End above the first line
+after them that gives a name, a date, a time, or a place (“Taught by…”,
+“Sundays, 12:00…”), even when it is large. Every element in the title area,
+or beside it at the same height, such as an age badge, goes in whole: start
+above the highest one and end below the lowest, with a gap of about 2% of
+the flyer's height on each side. A picture or panel that would be cut by the
+bottom edge is a sign to end higher. The image takes
+those rows of `flyer.webp`, as wide as 16:9 needs, centred at `centre`
+percent of the flyer's width (50 when left out), and writes `image.webp`,
+1920 × 1080 px. When the flyer is narrower than that, its edges are drawn out
+and blurred on both sides, so a tall title area still fits whole. For
+example, `npm run program-image -- folktales-and-faith 2.6 63` keeps that
+flyer's age badge and subtitle, and `npm run program-image -- anchored-hearts
+0 34.3 38` its logo and “Sister’s Circle”.
+
+Then open `image.webp` and look at all four edges: no letter, logo, or badge
+may touch or cross one, not even a sliver of it. If one does, move `top` up
+or `bottom` down to take it in whole, and run the command again. Never take
+the top of the flyer as it comes: a title's lower lines end up cut in half.
+
 Both are stored as WebP (`flyer.webp`, `image.webp`). To convert a JPG or PNG,
 run this from the repository root:
 
@@ -483,26 +540,62 @@ The form's name is all the site needs; do not add Zeffy's embed code (its
 ### Recipes
 
 **Add a program.**
-1. Copy the most similar current program folder and rename it (see the
-   naming rule under Programs).
+1. Copy `src/content/programs/example-program/` to a new folder named for the
+   program (see the naming rule under Programs). It shows every field in
+   use; it is a draft, so it is not on the site. Delete the comments at the
+   top of the copy and its `draft: true` line.
 2. In `index.md`, set `status` (`upcoming` until registration opens, then
    `open`) and every field that status needs (see Fields), copying names,
    dates, fees, and the Zeffy form or registration link (see Registration)
-   exactly as the organisation gives them.
-3. Replace `flyer.webp` with the new flyer and `image.webp` with the new
-   program image (see Program images), and rewrite `imageAlt`. Without a
-   program image, delete the file and both fields: the card then has no
-   picture and the page shows a patterned panel in its place.
+   exactly as the organisation gives them. Delete the fields the program
+   does not have.
+3. Add the flyer as `flyer.webp` and the program image as `image.webp`: the
+   designers' image, or one made from the flyer with `npm run program-image`
+   (see Program images). Then add the `image`, `imageAlt`, and `flyer` lines,
+   with `imageAlt` saying what the image shows (`Title artwork: Race to
+   Jannah, A BoxCar Adventure`).
 4. Write the Markdown body, or delete it if there is nothing beyond the
    fields.
-5. Run `npm run build`, then check the program page, Programs, its area page,
-   and the home page in `npm run dev`.
+5. Go through the Program checklist.
+
+**Program checklist.** Before opening a pull request that adds or changes a
+program, check each of these. The build stops on the ones marked (build),
+and its error says what to change.
+
+1. Every fact (title, dates, times, fee, audience, place, instructors,
+   registration) is copied from the flyer or the organisation's message. A
+   fact you were not given is left out, and the pull request says so.
+2. Their text is copied as they wrote it: the same words, spelling,
+   punctuation, symbols such as `•` and `+`, and capital letters, and every
+   part of it (“Weekly Themes & Activities” stays “Weekly themes &
+   activities”, never “Weekly themes”). The only changes are the Writing
+   conventions': curly quotes, no emoji, sentence-case headings, and dashes.
+   A change you would suggest, such as “Story board” to “Storyboard”, goes in
+   the pull request as a suggestion, not in the file. A field they did not
+   write, such as `summary`, is made from their own sentences, and the pull
+   request says so.
+3. The dates are in the year the flyer gives, or, without one, the next ones
+   after today (run `date`). Each falls on the weekday the flyer prints: a
+   weekly rule names it in `BYDAY` (build).
+4. Sessions on a pattern are one part with `repeat` (build), and the program
+   has no `card` (build) unless it has only `date`.
+5. `summary` is one sentence. Body headings are `##` and `###`, in sentence
+   case. `expect` does not repeat the body.
+6. Text follows the Writing conventions: curly quotes and apostrophes, no
+   emoji (build), dates without a leading zero (`Nov 7`).
+7. `image.webp` has nothing touching its edges (see Program images).
+8. `status` fits today: `completed` only after the last session; a program
+   that ended more than 30 days ago is `completed` (build).
+9. `npm run build` ends with `0 errors`. Then `npm run facts -- <folder>`
+   prints what the program's page says: compare it with the flyer line by
+   line, and paste its output, unchanged, in a code block in the pull
+   request's description, under “What the page says”.
 
 **Close registration early.** When registration closes while the program is
 still running, change only `status` to `closed`.
 
-**Retire a program.** Change `status` to `completed` and keep every other
-field. A gathering that repeats with no end also gets `UNTIL`, its last day,
+**Retire a program.** After its last session, change `status` to
+`completed` and keep every other field. A gathering that repeats with no end also gets `UNTIL`, its last day,
 in its rule.
 
 **Keep a program off the site.** Add `draft: true`; remove it to publish the
@@ -514,9 +607,10 @@ edit each month. For one whose day is set each time (for example Anchored
 Hearts), edit the same folder each cycle: the one part of `schedule`, the
 next session with `label: Monthly`; `registration` (when the session has its
 own form); instructors; and the “This month” text.
-Replace `flyer.webp` with the new flyer under the same name, and
-`image.webp` too if the artwork changed. The folder always describes the next
-session; earlier sessions are not kept.
+Replace `flyer.webp` with the new flyer under the same name, and make
+`image.webp` again from it with `npm run program-image` (see Program images)
+whenever the flyer's title area changed, as a month's name in it does. The
+folder always describes the next session; earlier sessions are not kept.
 
 **Archive-only record** (a past program that only has a flyer): a folder with
 `status: completed`, `title`, `area`, `schedule` from the flyer (or `date`
@@ -839,13 +933,22 @@ a redirect of its own.
 ## Writing conventions
 
 - Sentence case for headings (“What students will learn”). Eyebrows are
-  uppercased by CSS, so write them in sentence case too.
+  uppercased by CSS, so write them in sentence case too. This is for
+  headings only: labels, list items, and names keep the capitals they were
+  given.
+- American spelling in everything visitors read, as the organisation writes
+  (program, color, center, theater). This guide's own spelling is British;
+  the site's is not.
 - “On-site” with a hyphen as a label or before a noun (“On-site programs”);
   two words when describing where people meet (“classes meet on site”).
 - Times with the zone: `10:00 AM–1:00 PM CT`. En dash for ranges: spaced
   between dates (`Sept 14 – Oct 26`), unspaced between times. Spaced em dash
   ( — ) inside sentences.
 - Curly apostrophes and quotes (’ “ ”) in visible text.
+- Dates without a leading zero: `Nov 7`, `Dec 5`.
+- No emoji, even where a flyer or an announcement has them: they look
+  different on every device, and Windows shows a flag as two letters. The
+  build stops on one in a program.
 - A person's name and honorific come from their team file, and every page
   names them the same way, including program summaries and bios: Ustadhah
   for Sameera Shah, Ust. for the other teachers, Sr. and Br. as their files
@@ -854,7 +957,8 @@ a redirect of its own.
   with the plain name (“Mariam Sattar received…”). Write “‘Alimiyyah” with
   the opening mark.
 - Program names, fees, and dates exactly as on the flyer or as the
-  organisation gives them.
+  organisation gives them, and descriptions in the organisation's own
+  words. The conventions above are the only changes to make to them.
 
 ## Working in this repository
 
@@ -924,7 +1028,10 @@ content, so the routine part can go live without waiting.
    with no horizontal scrolling.
 3. Links you added work (internal links end in `/`).
 4. Every date, fee, name, and link you added comes from a real source.
-5. This file is updated if you changed a convention.
+5. A program change has been through the Program checklist, and the pull
+   request's description has the output of `npm run facts -- <folder>`,
+   pasted unchanged, for each program it changes.
+6. This file is updated if you changed a convention.
 
 ## After you open a pull request
 

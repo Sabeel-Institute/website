@@ -24,6 +24,42 @@
   `statusLabel` shows an open program with `registration: none` as “No
   registration needed”. Folder names are validated in `generateId`, and
   `womens-learning` / `youth-children` are reserved for the area pages.
+  `card` is refused with a `schedule`: the wording comes from the schedule,
+  and free text over it can contradict it unnoticed, a wrong year included.
+- Plain text fields people read go through the schema's `text`, which
+  curls straight quotes (`curlQuotes`, `src/lib/text.ts`): a quote after a
+  space, an opening bracket or quote, or a dash opens, and any other closes
+  or is an apostrophe. It is a safety net for content written with straight
+  quotes; AGENTS.md asks for curly ones and does not mention it. Markdown
+  (the body, `expect`, `policies`) is curled by Astro's processor.
+- Staff edit programs through agents (Jules) that follow errors more reliably
+  than prose, so the build checks the program conventions it can, each with an
+  error that names the fix. `regularSessions` (`src/lib/schedule.ts`, from the
+  program `superRefine`) finds one-session parts with the same time, label,
+  and venue a day, a week, or two weeks apart and names the `repeat` to write;
+  wider gaps are left alone (two dates five weeks apart are the second Sunday
+  of two months). `ruleProblem` refuses a weekly rule without `BYDAY`, since
+  without one ical.js repeats on `start`'s weekday and a wrong year passes.
+  `assertProgramText` (`src/lib/content.ts`) refuses emoji (`EMOJI`: flags,
+  emoji-presentation characters, and symbols with U+FE0F) in a program's data
+  and body. `assertProgramDates` refuses a program that is not completed and
+  whose `lastDay` is more than `ENDED_DAYS` (30) days before today in Houston;
+  it runs unless `CHECK_PROGRAM_DATES` is `false`, which `site.yml` sets for
+  the build that deploys `main` and for the visual comparison's build of
+  `main`, so the date never stops a deploy. Flyers have no orientation check:
+  the archive has square and landscape ones.
+- `src/content/programs/example-program/` is the program agents copy
+  (`draft: true`): the schema checks it on every build, so it always shows
+  fields that work, while a current program may carry one-off choices.
+- `scripts/program-image.mjs` (`npm run program-image`) crops a flyer's rows
+  to 16:9; when the flyer is narrower than 16:9 needs, the band's edge
+  columns are stretched outward (`extend` with `copy`), blurred while
+  shrunk, and the band is composited over them. Each sharp step is its own
+  pipeline: one pipeline resizes once and applies `extend` after `resize`
+  whatever the call order. `scripts/program-facts.mjs` (`npm run facts`)
+  reads the facts back from `dist/` by `FactsBar`'s `<dl>`, the eyebrow before
+  the `<h1>`, and the first Register link; a markup change there needs a
+  matching change in it.
 - `assertBespokePages` (`src/lib/content.ts`) runs while program pages are
   generated and fails the build when a `page:` value has no matching file in
   `src/pages/`. Its route list skips files and folders starting with `_`, as
@@ -46,7 +82,10 @@
   PM to AM, past midnight, or on a multi-day event. The count (“7
   sessions”) is given for one part, or for parts that are plain blocks of
   dates: parts with their own label or venue are tracks or activities, and
-  parts after midnight share days with the evening's. `programLocation`
+  parts after midnight share days with the evening's. Up to
+  `LIST_SESSIONS` (4) counted sessions in one year, not all on consecutive
+  days, are listed by date instead (“Nov 1 & Nov 8”), without the count,
+  because “Nov 1–8 · 2 sessions” reads as every day between. `programLocation`
   shows `location`, or the venues' names, and map links for every venue the
   program or its parts name: Google Maps search URLs built from a venue's
   name and address.

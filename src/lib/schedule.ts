@@ -116,6 +116,11 @@ function ruleProblem(rule: string): string | undefined {
     return 'only a MONTHLY rule names days of the month (BYMONTHDAY=15) or weeks of it (BYDAY=-1WE)';
   }
   if (recur.freq === 'DAILY' && byday.length) return 'a rule for some weekdays is WEEKLY, e.g. FREQ=WEEKLY;BYDAY=MO,WE';
+  // Without BYDAY a weekly rule repeats on start's weekday, whatever it is, so
+  // a date in the wrong year would pass; with it, a start off the rule fails.
+  if (recur.freq === 'WEEKLY' && !byday.length) {
+    return 'a weekly repeat names its days as the flyer gives them, e.g. BYDAY=SA for Saturdays: FREQ=WEEKLY;BYDAY=SA;COUNT=4';
+  }
   return undefined;
 }
 
@@ -202,6 +207,49 @@ export function checkPart(part: SchedulePart): [keyof SchedulePart, string][] {
   }
   if (!problems.length && !expand(part).dates.length) problems.push(['skip', 'skip leaves no sessions']);
   return problems;
+}
+
+/**
+ * Single sessions that one repeating part could give: two or more with the
+ * same time, label, and place, a day, a week, or two weeks apart. A rule
+ * names the weekday, so the build checks each date against it, and cards
+ * word it ("Every other Saturday"). Wider gaps are left alone: two dates
+ * five weeks apart are more likely a monthly pattern (the second Sunday)
+ * than a weekly one. Returns, for each such group, the part to write
+ * instead.
+ */
+export function regularSessions(parts: readonly SchedulePart[]): string[] {
+  const groups = new Map<string, Date[]>();
+  for (const p of parts) {
+    if (p.repeat || p.end) continue;
+    const key = [p.time ?? '', p.label ?? '', p.venue?.id ?? ''].join('|');
+    groups.set(key, [...(groups.get(key) ?? []), p.start]);
+  }
+  const found: string[] = [];
+  for (const days of groups.values()) {
+    if (days.length < 2) continue;
+    days.sort((a, b) => +a - +b);
+    const gap = (+days[1]! - +days[0]!) / DAY_MS;
+    if (gap < 1 || !days.every((d, i) => !i || (+d - +days[i - 1]!) / DAY_MS === gap)) continue;
+    const weeks = gap / 7;
+    let rule: string;
+    if (gap === 1) rule = `FREQ=DAILY;COUNT=${days.length}`;
+    else if (weeks === 1 || weeks === 2) {
+      const code = Object.keys(ICAL_DAY).find((c) => ICAL_DAY[c] === days[0]!.getUTCDay())!;
+      rule = `FREQ=WEEKLY;${weeks === 2 ? 'INTERVAL=2;' : ''}BYDAY=${code};COUNT=${days.length}`;
+    } else continue;
+    found.push(
+      `the sessions on ${and(days.map(md))} repeat ${gap === 1 ? 'daily' : weeks === 1 ? 'weekly' : 'every other week'}: ` +
+        `write them as one part with start: ${iso(days[0]!)} and repeat: ${rule} (see Schedule in AGENTS.md)`,
+    );
+  }
+  return found;
+}
+
+/** A schedule's last day; undefined when a part repeats with no end. */
+export function lastDay(parts: readonly SchedulePart[]): Date | undefined {
+  const xs = parts.map(expand);
+  return xs.some((x) => !x.last) ? undefined : new Date(Math.max(...xs.map((x) => +x.last!)));
 }
 
 /** True when a part repeats with no end; false too when its rule does not parse, which `checkPart` reports. */
@@ -293,21 +341,28 @@ function partTime(x: Expanded): string {
 export type ScheduleText = {
   /** First day; orders listings. */
   first: Date;
-  /** Card line: "Sept 14 – Oct 26 · 7 sessions", "Saturday, Oct 24", "From March 25, 2026". */
+  /** Card line: "Sept 14 – Oct 26 · 7 sessions", "Nov 1 & Nov 8", "Saturday, Oct 24", "From March 25, 2026". */
   cardDates: string;
   /** Card lines, one per part: "Mondays · 12:00–1:30 PM CT". */
   cardLines: string[];
-  /** Page: "Sept 14 – Oct 26, 2026", "Saturday, October 24, 2026". */
+  /** Page: "Sept 14 – Oct 26, 2026", "Nov 1 & Nov 8, 2026", "Saturday, October 24, 2026". */
   pageDates: string;
   /** Page lines, one per part, naming each part's place when it has its own. */
   pageLines: string[];
   /**
    * "7 sessions", "3 days"; only for more than one, for one part or plain
    * blocks of dates, and not when parts share a day (activities on the same
-   * nights), where a count would mislead.
+   * nights), where a count would mislead, or when the dates are listed.
    */
   length?: string;
 };
+
+/**
+ * Up to this many sessions on separate days in one year are listed by date
+ * ("Nov 7, Nov 21, Dec 5 & Dec 19"): a range ("Nov 1–8 · 2 sessions") reads
+ * as every day between.
+ */
+const LIST_SESSIONS = 4;
 
 /**
  * How a schedule reads on cards and pages. `venueName` names a part's own
@@ -326,15 +381,32 @@ export function describeSchedule(parts: readonly SchedulePart[], venueName: (id:
   // Parts with their own label or place are tracks or activities people may
   // not all attend, so only one part, or plain blocks of dates, are counted.
   const blocks = xs.length === 1 || xs.every((x) => !x.part.label && !x.part.venue);
-  const length = last && count > 1 && blocks && !shareDays ? `${count} ${noun}` : undefined;
+  const counted = last && count > 1 && blocks && !shareDays;
   const oneSession = xs.length === 1 && xs[0]!.kind === 'single';
+  // Consecutive days read well as a range ("Oct 5–8"), and a multi-day event is one.
+  const sessions = xs.flatMap((x) => x.dates).sort((a, b) => +a - +b);
+  const listed =
+    counted &&
+    count <= LIST_SESSIONS &&
+    xs.every((x) => x.kind !== 'span') &&
+    sessions.some((d, i) => i > 0 && +d - +sessions[i - 1]! > DAY_MS) &&
+    first.getUTCFullYear() === last!.getUTCFullYear()
+      ? and(sessions.map(md))
+      : undefined;
+  const length = counted && !listed ? `${count} ${noun}` : undefined;
 
   const cardDates = openEnded
     ? `From ${md(first)}, ${first.getUTCFullYear()}`
     : oneSession
       ? `${DAYS[first.getUTCDay()]}, ${md(first)}`
-      : [range(first, last!), length].filter(Boolean).join(' · ');
-  const pageDates = openEnded ? `From ${md(first)}, ${first.getUTCFullYear()}` : oneSession ? longDate(first) : range(first, last!, true);
+      : (listed ?? [range(first, last!), length].filter(Boolean).join(' · '));
+  const pageDates = openEnded
+    ? `From ${md(first)}, ${first.getUTCFullYear()}`
+    : oneSession
+      ? longDate(first)
+      : listed
+        ? `${listed}, ${first.getUTCFullYear()}`
+        : range(first, last!, true);
 
   // A timed multi-day event names its days in its time.
   const detail = (x: Expanded) => (x.kind === 'span' && x.time?.to !== undefined ? partTime(x) : [days(x), partTime(x)].filter(Boolean).join(' · '));

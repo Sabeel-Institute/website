@@ -20,7 +20,9 @@ import {
   STATUS_LABEL,
   asLines,
   assertBespokePages,
+  assertProgramDates,
   assertProgramImages,
+  assertProgramText,
   programLocation,
   programSchedule,
   renderCardText,
@@ -34,6 +36,8 @@ export const getStaticPaths = (async () => {
   const programs = (await getCollection('programs')).filter((p) => !p.data.draft);
   assertBespokePages(programs);
   assertProgramImages(programs);
+  assertProgramText(programs);
+  assertProgramDates(programs);
   return programs.filter((p) => !p.data.page).map((program) => ({ params: { slug: program.id }, props: { program } }));
 }) satisfies GetStaticPaths;
 

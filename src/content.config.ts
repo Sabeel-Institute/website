@@ -8,7 +8,8 @@
 import { defineCollection, reference } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { checkPart, repeatsForever } from './lib/schedule';
+import { checkPart, regularSessions, repeatsForever } from './lib/schedule';
+import { curlQuotes } from './lib/text';
 
 /** The three program areas that organise Programs and the archive. */
 export const PROGRAM_AREAS = ['hikam-foundations', 'womens-learning', 'youth-children'] as const;
@@ -31,12 +32,15 @@ const unknownField = (what: string) => ({
     issue.code === 'unrecognized_keys' ? `${issue.keys?.join(', ')}: not a ${what} field (see AGENTS.md)` : undefined,
 });
 
+/** Text people read, with straight quotes made curly (see CLAUDE.md). */
+const text = z.string().min(1).transform(curlQuotes);
+
 /**
  * Text people read: one line, or a list of lines. In YAML, a line that
  * contains ": " is read as a field unless it is in quotes, hence the hint.
  */
 const lines = (field: string) =>
-  z.union([z.string().min(1), z.array(z.string().min(1)).min(1)], {
+  z.union([text, z.array(text).min(1)], {
     error: `${field} is a line of text or a list of lines; put a line that contains ": " in quotes`,
   });
 
@@ -74,9 +78,9 @@ const programs = defineCollection({
     const instructor = z.union([
       reference('team'),
       z.strictObject({
-        name: z.string().min(1),
-        role: z.string().min(1).optional(),
-        highlights: z.array(z.string().min(1)).max(3).optional(),
+        name: text,
+        role: text.optional(),
+        highlights: z.array(text).max(3).optional(),
       }, unknownField('guest instructor')),
     ], {
       error: 'an instructor is a team file name (sameera-shah), or a guest with name:, and optionally role: and highlights: (see Fields in AGENTS.md)',
@@ -102,7 +106,7 @@ const programs = defineCollection({
         /** Where this part meets, when not at the program's venue. */
         venue: reference('venues').optional(),
         /** A few words that set this part apart: "Book club", "Girls 14+". */
-        label: z.string().min(1).optional(),
+        label: text.optional(),
       }, unknownField('schedule part'))
       .superRefine((p, ctx) => {
         // Zod runs this even when a field failed; its dates are only usable once they parsed.
@@ -113,11 +117,11 @@ const programs = defineCollection({
     return z
       .strictObject({
         status: z.enum(PROGRAM_STATUSES),
-        title: z.string().min(1),
+        title: text,
         /** Optional tagline under the title. */
-        subtitle: z.string().min(1).optional(),
+        subtitle: text.optional(),
         /** One clear sentence: what students will learn and why it matters. Used in link previews. */
-        summary: z.string().min(1).optional(),
+        summary: text.optional(),
         area: z.enum(PROGRAM_AREAS),
         /** When it meets: one part, or several (see Schedule in AGENTS.md). */
         schedule: z.array(part).min(1).optional(),
@@ -170,11 +174,14 @@ const programs = defineCollection({
         /** Registration deadline as people should read it. */
         deadline: lines('deadline').optional(),
         /** A short line in bold above the Register button: an early-bird price, limited seats, a new date. */
-        highlight: z.string().min(1).optional(),
-        /** One or two lines a card, or a Programs list, shows in place of its dates and times. */
-        card: z.union([z.string().min(1), z.array(z.string().min(1)).min(1).max(2)]).optional(),
+        highlight: text.optional(),
+        /**
+         * Only without a schedule: one or two lines a card, or a Programs list,
+         * shows in place of its dates ("2 years · Starts 2027").
+         */
+        card: z.union([text, z.array(text).min(1).max(2)]).optional(),
         /** Three to five things students will learn. */
-        outcomes: z.array(z.string().min(1)).min(1).max(8).optional(),
+        outcomes: z.array(text).min(1).max(8).optional(),
         instructors: z.array(instructor).min(1).optional(),
         /** Teaching format, activities, homework, parent role, participation, and anything to bring or know first; Markdown without headings. */
         expect: z.string().min(1).optional(),
@@ -185,7 +192,7 @@ const programs = defineCollection({
          * on its card, at the top of its page, and in link previews.
          */
         image: image().optional(),
-        imageAlt: z.string().min(1).optional(),
+        imageAlt: text.optional(),
         /** The original flyer, US Letter portrait (2550 × 3300 px), shown lower on the page. */
         flyer: image().optional(),
         /** always puts the program on the home page, ahead of the others, until it is completed; never keeps it off. */
@@ -213,6 +220,13 @@ const programs = defineCollection({
         if (d.image && !d.imageAlt) issue('imageAlt', 'imageAlt is required when image is set');
         if (!d.schedule && !d.date) issue('schedule', 'give the program a schedule, or a date when its schedule is not known (see Schedule in AGENTS.md)');
         if (d.schedule && d.date) issue('date', 'a program with a schedule takes its date from it: remove date');
+        if (d.schedule && d.card) {
+          issue('card', 'card is only for a program without a schedule: cards word a schedule\'s dates and times themselves (see Cards in AGENTS.md)');
+        }
+        // A part that failed its own checks may hold no date to compare.
+        if (d.schedule?.every((p) => p.start instanceof Date)) {
+          for (const message of regularSessions(d.schedule)) issue('schedule', message);
+        }
         if (d.status !== 'completed' && !d.summary) issue('summary', 'summary is required until the program is completed');
         if ((d.status === 'open' || d.status === 'ongoing') && !d.format) issue('format', 'format is required while people can join: it decides where the program is listed');
         if (d.homePriority !== undefined && d.home !== 'always') {
@@ -228,18 +242,18 @@ const programs = defineCollection({
 const team = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/team' }),
   schema: z.strictObject({
-    name: z.string().min(1),
+    name: text,
     honorific: z.enum(['Ustadhah', 'Ust.', 'Sr.', 'Br.', 'Dr.']),
     /** Section on the Teachers & Team page. */
     group: z.enum(['founder', 'board', 'teachers', 'volunteers']),
     /** Position within the group, ascending. */
     order: z.number().int(),
     /** e.g. "Program Director and Teacher". */
-    role: z.string().min(1).optional(),
+    role: text.optional(),
     /** Optional subtitle below the main role/title. */
-    sub: z.string().min(1).optional(),
+    sub: text.optional(),
     /** The short bio under the name: studies and degrees, one short line each ("Sabeel Graduate", "‘Alimiyyah"). The body is the long bio. */
-    highlights: z.array(z.string().min(1)).max(3).optional(),
+    highlights: z.array(text).max(3).optional(),
     /** false keeps the file but hides the person from the site. */
     listed: z.boolean().default(true),
   }, unknownField('team')),
@@ -250,8 +264,8 @@ const testimonials = defineCollection({
   schema: z.strictObject({
     /** Unique; what tells the quotes apart. */
     id: z.string().min(1),
-    program: z.string().min(1),
-    quote: z.string().min(1),
+    program: text,
+    quote: text,
   }, unknownField('testimonial')),
 });
 
@@ -261,7 +275,7 @@ const venues = defineCollection({
   schema: z.strictObject({
     /** What programs write in `venue`, e.g. "masjid-istiqlal". */
     id: z.string().min(1),
-    name: z.string().min(1),
+    name: text,
     /** Street address, linked to a map on program pages. Only as the organisation gives it. */
     address: z.string().min(1).optional(),
   }, unknownField('venue')),
@@ -280,7 +294,7 @@ const gallery = defineCollection({
         /** The photo: a WebP file in src/content/gallery/. */
         image: image(),
         /** What the photo shows, for people who cannot see it. */
-        alt: z.string().min(1),
+        alt: text,
         /** The program the photo is from; its name and year, linked to its page, go under the photo. */
         program: reference('programs').optional(),
       }, unknownField('gallery photo')),

@@ -26,7 +26,10 @@ flowchart TB
 - `.github/workflows/site.yml` builds every pull request and every push to
   `main`. Only pushes to `main` run its `deploy-live` job. For pull requests,
   its `visual-diff` job compares screenshots of the changed pages with `main`
-  (see [Visual comparison](#visual-comparison)).
+  (see [Visual comparison](#visual-comparison)). A pull request's build also
+  stops on a current program whose last session was more than 30 days ago;
+  the push build and the visual comparison's build of `main` set
+  `CHECK_PROGRAM_DATES: false`, so the date never stops a deploy.
 - `.github/workflows/preview.yml` runs after a pull request's Site workflow
   succeeds. GitHub runs it from `main` (a `workflow_run` trigger), so a pull
   request cannot change what it does. It never runs pull-request code: it
@@ -638,3 +641,4 @@ run `npx firebase-tools@15 login:use faisal.shah@oursabeel.com`.
 | The comment says pages "could not be captured" | Their screenshots failed, usually because the page never finished loading, kept its browser busy for more than 30 seconds, or navigated away. The visual-diff job's log in the Site run names the error. Open the page on the preview to see what it does. |
 | The visual comparison shows a difference nobody made | Screenshots differ only if the rendering differs, so look for a shared change (a stylesheet, the header or footer, a component used on many pages). If pages differ when comparing a build with itself, the screenshots are not repeatable; see the visual comparison notes in `CLAUDE.md`. |
 | Previews stop after renaming the build workflow | `preview.yml`'s `workflows: [Site]` does not match `site.yml`'s `name:`. |
+| Every pull request's build fails naming a program whose last session was long ago | That program is past and not yet `completed`. Set its `status` to `completed` in its own routine pull request (or in the failing one), as the error says. |

@@ -83,17 +83,18 @@ the same order.
 3. **Title.** As on the flyer.
 4. **Who it’s for.** Your words: “Adult women”, “Boys 12–16 · Girls 13+”.
    *Optional*
-5. **Dates and how many sessions.** Written from the dates you give.
+5. **Dates and how many sessions.** Written from the dates you give; up to
+   four sessions are listed by date (“Nov 7, Nov 21, Dec 5 & Dec 19”).
    *Automatic*
 6. **Days and time.** One line for each part of the schedule. *Automatic*
 7. **Online, On-site, or Online & on-site.** Also decides which group the
    card sits in on Programs.
 8. **View Details.** Opens the course page.
 
-> **When the dates are complicated:** lines 5 and 6 can be replaced with one
-> or two short lines of your own, for a schedule too long for a small card.
-> Use this rarely: those lines are not checked against the real dates.
-> Your agent’s word: `card`.
+> **When only the year is known:** a course announced before its dates shows
+> “Starts 2027” in place of lines 5 and 6, or one or two short lines of your
+> own, such as “2 years · Starts 2027”. Your agent’s word: `card`. Once a
+> course has dates, the card always shows them as the site writes them.
 
 ### How the cards are arranged
 
@@ -114,7 +115,8 @@ each, with their dates:
 
 3. **Coming soon.** Title, area, and dates, or your own card lines (here
    “2 years · Starts 2027”).
-4. **Registration closed.** Title, area, dates, and how many sessions.
+4. **Registration closed.** Title, area, and dates, with how many sessions,
+   or each date for up to four.
 
 ## The home page
 
@@ -309,15 +311,15 @@ marked “Example” are made up; the others are real courses.
 | Investing workshop · one session | Saturday, October 24, 3 to 5 pm. | Saturday, Oct 24<br>3:00–5:00 PM CT |
 | Mommy Burnout · a weekly course | Seven Mondays from September 14, 12 to 1:30. | Sept 14 – Oct 26 · 7 sessions<br>Mondays · 12:00–1:30 PM CT |
 | Example · two days a week | Tuesdays and Thursdays from January 12, eight sessions, 7 to 8 pm. | Jan 12 – Feb 4 · 8 sessions<br>Tuesdays & Thursdays · 7:00–8:00 PM CT |
-| Teen Sundays · every other week | Every other Sunday from September 13, four times, 2:15 to 4:15. | Sept 13 – Oct 25 · 4 sessions<br>Every other Sunday · 2:15–4:15 PM CT |
-| Race to Jannah · a weekend | Saturday October 31 and Sunday November 1, 2:30 to 4:30. | Oct 31 – Nov 1 · 2 days<br>Sat & Sun · 2:30–4:30 PM CT |
+| Teen Sundays · every other week | Every other Sunday from September 13, four times, 2:15 to 4:15. | Sept 13, Sept 27, Oct 11 & Oct 25<br>Every other Sunday · 2:15–4:15 PM CT |
+| Race to Jannah · two Sundays | Sundays, November 1 and 8, 2:30 to 4:30. | Nov 1 & Nov 8<br>Sundays · 2:30–4:30 PM CT |
+| Example · a weekend | Saturday October 31 and Sunday November 1, 2:30 to 4:30. | Oct 31 – Nov 1 · 2 days<br>Sat & Sun · 2:30–4:30 PM CT |
 | Monthly Qur’an Room · monthly, no end | The last Wednesday of every month, starting March 25, 10 to 10:30 am. | From March 25, 2026<br>Last Wednesday of each month · 10:00–10:30 AM CT |
 | Anchored Hearts · a new date each month | This month’s gathering is Friday, October 16, 5:30 to 7:45. It meets monthly. | Friday, Oct 16<br>Monthly · 5:30–7:45 PM CT |
 | Example · a week off | Thursdays from November 5 to December 10, 10 am to 1 pm, but not on Thanksgiving, November 26. | Nov 5 – Dec 10 · 5 sessions<br>Thursdays · 10:00 AM–1:00 PM CT |
 | Example · two blocks of days | Monday to Thursday, June 14 to 17, then again June 28 to July 1, 10 am to 1 pm. | June 14 – July 1 · 8 sessions<br>June 14–17: Mon–Thu · 10:00 AM–1:00 PM CT<br>June 28 – July 1: Mon–Thu · 10:00 AM–1:00 PM CT |
 | Camp Futuwwah 2026 · two places | July 25 to 28 at Maryam Islamic Center, then July 29 to August 1 at Masjid Al-Aqsa, 4:45 to 7:45 each day. | July 25 – Aug 1<br>July 25–28: Sat–Tue · 4:45–7:45 PM CT<br>July 29 – Aug 1: Wed–Sat · 4:45–7:45 PM CT<br>(The course page names each place, with a map link for each.) |
 | Example · an overnight trip | A camping trip from Friday March 12 to Sunday March 14, overnight. | March 12–14 · 3 days<br>Overnight · Fri–Sun<br>(With times, such as leaving Friday at 4 pm and back Sunday at 2 pm, the line reads “Fri 4:00 PM – Sun 2:00 PM CT”.) |
-| Example · your own card lines | On the card, just say “Two 4-day camps” and the time. | Two 4-day camps · July 25 – Aug 1<br>4:45–7:45 PM CT<br>(The course page still shows the full schedule.) |
 | Example · nights of Ramadan | Ten nights from March 1: reflections at 11:45 pm, then games at 2 am. | March 1–11<br>Nightly reflections: Daily · 11:45 PM CT<br>Games: Daily · 2:00 AM CT<br>(An activity after midnight falls on the next calendar day, so the dates end a day after the last night.) |
 
 **Also possible:**
@@ -333,8 +335,9 @@ marked “Example” are made up; the others are real courses.
 
 **Written by the site,** the same on every course so visitors always know
 where to look: the style of dates and times (“Sept 14 – Oct 26”,
-“12:00–1:30 PM CT”); the count of sessions or days; and “Mondays”, “Every
-other Sunday”, “Last Wednesday of each month”.
+“12:00–1:30 PM CT”); the count of sessions or days, or the dates themselves
+for up to four sessions; and “Mondays”, “Every other Sunday”, “Last
+Wednesday of each month”.
 
 Your agent’s words: `schedule` for the dates and times, `date` when only the
 year is known.
@@ -418,9 +421,9 @@ them as they are. Designers can make both from the same artwork.
 
 - Any wide (16:9) preset works for the course picture, such as Canva’s
   “Presentation (16:9)”.
-- No course picture yet? A wide crop of the flyer’s title can stand in until
-  there is one. Without either, the card has no picture and the page shows a
-  pattern in its place.
+- No course picture yet? Your agent can make one from the flyer’s title
+  area (its logo, title, and subtitle) until there is one. Without either,
+  the card has no picture and the page shows a pattern in its place.
 - Square (1080 × 1080) and 4:5 (1080 × 1350) flyers for Instagram and
   WhatsApp are not used by the website.
 - Teacher profiles on the website are text only, so no instructor photos
@@ -439,7 +442,7 @@ the names”), and your agent writes it.
 |---|---|---|
 | Title, subtitle, summary, highlight line | One line of plain text | Register by October 20 and save $5. |
 | Who it’s for, location, fee, registration deadline | One line, or several lines shown one under another. No bold or links | $50 in person<br>$75 online |
-| Your own card lines | One or two short lines | Two 4-day camps · July 25 – Aug 1 |
+| Your own card lines (only before a course has dates) | One or two short lines | 2 years · Starts 2027 |
 | What students will learn | A list of short points, plain text | Navigate stress with greater calm and resilience |
 | Instructor (guest speakers) | A name, a role, and up to three short lines. Team members’ details come from their own profiles | Sr. Heba · Guest speaker |
 | What to expect, Policies | Paragraphs, bullet points, numbered lists, bold, italics, and links. No headings | See [the cards](#the-cards) |
@@ -569,11 +572,12 @@ change for the website’s administrator, not a request for one course.
 - The stage, and how people register.
 - The picture, the flyer, and the instructors.
 - Which optional parts appear: leave one out and it’s hidden.
-- Your own card lines, when the dates are too long for a card.
+- Your own card lines, while a course has only its year.
 
 **The template decides:**
 
 - The order of the parts on the page and on the card.
+- No emoji: they look different on every phone and computer.
 - Colours, fonts, sizes, and icons.
 - Headings such as “What students will learn” and “Ready to join?”.
 - Button words: Register, Ask a Question, View Details, Join the Interest
@@ -597,6 +601,10 @@ request”). A few minutes later a comment appears on it with two links:
   too.
 - **Visual changes:** before-and-after pictures of every page that looks
   different. Check that only the pages you expected changed.
+
+Your agent also lists, in the pull request, what the course page says: its
+stage, dates, days and times, place, fee, and where Register leads. Check
+each line against the flyer before you publish.
 
 When it looks right, publish it: at the bottom of the pull request, press the
 green merge button, then confirm. The live site shows the change a few
