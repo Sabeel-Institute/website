@@ -18,7 +18,6 @@ registration:
   zeffy: anchored-hearts-sisters-circle-november
 instructors:
   - zona-bokhari
-expect: An uplifting halaqa on how seeking knowledge keeps us grounded in faith, strengthens our connection with Allah, and guides us toward Jannah, followed by games and sisterhood.
 image: ./image.webp
 imageAlt: "Title artwork: Anchored Hearts, Sister’s Circle"
 flyer: ./flyer.webp
@@ -26,9 +25,9 @@ flyer: ./flyer.webp
 
 Anchored Hearts is a monthly gathering for sisters to learn, reflect, and connect. Each gathering offers a welcoming space to nurture faith and build sisterhood.
 
-## This month: A Path to Jannah in Every Season of Life with Ust. Zona Bokhari
+## This month: Seek ‘Ilm. Seek Jannah.
 
-Join us for an uplifting halaqa on how seeking knowledge keeps us grounded in faith, strengthens our connection with Allah, and guides us toward Jannah. Halaqa will be followed by fun games and sisterhood. 🤍
+**A Path to Jannah in Every Season of Life, with Ust. Zona Bokhari, on Saturday, November 14.** Join us for an uplifting halaqa on how seeking knowledge keeps us grounded in faith, strengthens our connection with Allah, and guides us toward Jannah. Halaqa will be followed by fun games and sisterhood.
 
 ### Schedule
 
