@@ -1,0 +1,415 @@
+---
+/**
+ * A month calendar of program sessions (see Calendar in AGENTS.md). On a
+ * large screen each day lists its sessions, and pointing at or focusing one
+ * shows its details; on smaller screens a small month links each day to a
+ * list of the month's sessions. Every session links to its program's page.
+ * The script shows the visitor's month and the next, marks today and the
+ * days before it, and filters by program area.
+ */
+import Icon from './Icon.astro';
+import { areas, type AreaId } from '../site.config';
+import { asLines, programHref, statusLabel, type Session } from '../lib/content';
+
+interface Props {
+  /** First day of each month, in order (`getCalendar`). */
+  months: Date[];
+  sessions: Session[];
+}
+
+const { months, sessions } = Astro.props;
+
+/** Each area's colour: a session's bar and tint, and its dot. Decoration only; the area is also in words. */
+const TONE: Record<AreaId, { chip: string; dot: string }> = {
+  'womens-learning': { chip: 'border-l-raspberry bg-raspberry/[0.07] hover:bg-raspberry/[0.13]', dot: 'bg-raspberry' },
+  'youth-children': { chip: 'border-l-sage bg-sage/25 hover:bg-sage/40', dot: 'bg-sage' },
+  'hikam-foundations': { chip: 'border-l-gold bg-gold/15 hover:bg-gold/25', dot: 'bg-gold' },
+};
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAY_MS = 86_400_000;
+
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+const monthTitle = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const longDay = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' });
+const count = (n: number) => `${n} ${n === 1 ? 'session' : 'sessions'}`;
+
+const byDay = new Map<string, Session[]>();
+for (const s of sessions) byDay.set(iso(s.day), [...(byDay.get(iso(s.day)) ?? []), s]);
+/** Areas with sessions; the filter appears when there is more than one. */
+const shownAreas = (Object.keys(areas) as AreaId[]).filter((a) => sessions.some((s) => s.program.data.area === a));
+
+const calendar = months.map((first) => {
+  const key = iso(first).slice(0, 7);
+  const length = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate();
+  const lead = first.getUTCDay();
+  /** The month's weeks, Sunday first; days of other months are empty. */
+  const cells = Array.from({ length: Math.ceil((lead + length) / 7) * 7 }, (_, i) => {
+    const n = i - lead;
+    return n >= 0 && n < length ? new Date(+first + n * DAY_MS) : undefined;
+  });
+  const weeks = Array.from({ length: cells.length / 7 }, (_, w) => cells.slice(w * 7, w * 7 + 7));
+  const days = cells.flatMap((d) => (d && byDay.has(iso(d)) ? [d] : []));
+  return { key, title: monthTitle.format(first), weeks, days, total: days.reduce((n, d) => n + byDay.get(iso(d))!.length, 0) };
+});
+
+/** What a session's details say, in order. */
+function details(s: Session) {
+  const d = s.program.data;
+  return [
+    { icon: 'calendar', text: longDay.format(s.day) },
+    { icon: 'clock', text: [s.label, s.time].filter(Boolean).join(' · ') },
+    { icon: d.format === 'Online' ? 'laptop' : 'map-pin', text: s.place ?? d.format },
+    { icon: 'users', text: asLines(d.audience).join(' · ') },
+  ].filter((x): x is { icon: 'calendar' | 'clock' | 'laptop' | 'map-pin' | 'users'; text: string } => Boolean(x.text));
+}
+---
+
+<div data-calendar class="rounded-card border border-gold/60 border-t-4 border-t-gold bg-surface p-4 shadow-card sm:p-6 lg:p-8">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h2 data-cal-title class="display-md sm:text-[2.35rem]">{calendar[0]!.title}</h2>
+      <p class="mt-1 text-[15px] text-ink-soft">
+        <span data-cal-count>{count(calendar[0]!.total)}</span> · Times are Central (CT)
+      </p>
+    </div>
+    <div data-cal-nav hidden class="flex shrink-0 gap-2 pt-1 sm:pt-2">
+      {
+        [
+          { dir: 'prev', icon: 'chevron-left', label: 'Previous month' },
+          { dir: 'next', icon: 'chevron-right', label: 'Next month' },
+        ].map((b) => (
+          <button
+            type="button"
+            data-cal-step={b.dir}
+            class="grid size-11 place-items-center rounded-full border border-gold/60 bg-surface text-ink transition-colors hover:border-raspberry hover:bg-raspberry hover:text-on-raspberry disabled:pointer-events-none disabled:opacity-35"
+          >
+            <Icon name={b.icon as 'chevron-left' | 'chevron-right'} class="size-5" label={b.label} />
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  {
+    shownAreas.length > 1 && (
+      <div data-cal-filter hidden role="group" aria-label="Program areas to show" class="mt-5 flex flex-wrap gap-2">
+        {shownAreas.map((a) => (
+          <button
+            type="button"
+            aria-pressed="true"
+            data-cal-area={a}
+            class="group/area inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-canvas px-3.5 text-sm text-ink-soft sm:gap-2.5 sm:px-4 sm:text-[15px] transition-colors hover:border-gold aria-pressed:border-gold/60 aria-pressed:bg-surface aria-pressed:text-ink"
+          >
+            <span
+              class:list={[
+                'size-2.5 rounded-full transition-opacity group-aria-[pressed=false]/area:opacity-30',
+                TONE[a].dot,
+              ]}
+            />
+            {areas[a].label}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    calendar.map((m, mi) => (
+      <div data-cal-month={m.key} data-title={m.title} hidden={mi !== 0} class="mt-6">
+        {/* Large screens: the month with each day's sessions. */}
+        <table class="hidden w-full table-fixed border-collapse lg:table">
+          <caption class="sr-only">{m.title}</caption>
+          <thead>
+            <tr>
+              {WEEKDAYS.map((w) => (
+                <th scope="col" class="px-2.5 pb-3 text-left font-label text-[13px] font-bold tracking-[0.08em] text-gold-text uppercase">
+                  <abbr title={w} class="no-underline">
+                    {w.slice(0, 3)}
+                  </abbr>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {m.weeks.map((week, row) => (
+              <tr>
+                {week.map((day, col) =>
+                  day ? (
+                    <td data-day={iso(day)} class="group/day h-32 border border-border p-1.5 align-top data-today:bg-raspberry/[0.04] xl:p-2">
+                      <time
+                        datetime={iso(day)}
+                        class="ml-0.5 grid size-7 place-items-center rounded-full font-label text-sm font-semibold text-ink group-data-past/day:text-muted group-data-today/day:bg-raspberry group-data-today/day:text-on-raspberry"
+                      >
+                        {day.getUTCDate()}
+                      </time>
+                      {byDay.has(iso(day)) && (
+                        <ul class="mt-1 space-y-1">
+                          {byDay.get(iso(day))!.map((s, i) => {
+                            const id = `cal-${iso(day)}-${i}`;
+                            const d = s.program.data;
+                            return (
+                              <li data-area={d.area} data-tip class="group/ev relative">
+                                <a
+                                  href={programHref(s.program)}
+                                  aria-describedby={id}
+                                  class:list={[
+                                    'block rounded-md border-l-[3px] px-2 py-1.5 transition-colors group-data-past/day:opacity-55',
+                                    TONE[d.area].chip,
+                                  ]}
+                                >
+                                  {s.short && <span class="block font-label text-xs font-semibold text-ink-soft">{s.short}</span>}
+                                  <span class="line-clamp-2 text-[13px] leading-snug font-semibold text-ink">{d.title}</span>
+                                </a>
+                                <div
+                                  id={id}
+                                  role="tooltip"
+                                  class:list={[
+                                    'invisible absolute z-30 w-80 opacity-0 transition-[opacity,visibility] duration-150 group-focus-within/ev:visible group-focus-within/ev:opacity-100 group-hover/ev:visible group-hover/ev:opacity-100',
+                                    col < 4 ? '-left-1' : '-right-1',
+                                    row < 3 ? 'top-full pt-2' : 'bottom-full pb-2',
+                                  ]}
+                                >
+                                  <div class="rounded-card border border-gold/60 border-t-4 border-t-gold bg-surface p-4 shadow-card">
+                                    <p class="text-xs font-bold tracking-[0.06em] text-gold-text uppercase">
+                                      {areas[d.area].label} · {statusLabel(s.program)}
+                                    </p>
+                                    <p class="mt-1.5 font-display text-xl leading-tight font-bold text-raspberry">{d.title}</p>
+                                    <ul class="mt-3 space-y-1.5 text-sm leading-snug text-ink-soft">
+                                      {details(s).map((x) => (
+                                        <li class="flex gap-2.5">
+                                          <Icon name={x.icon} class="mt-px size-4 shrink-0 text-gold-text" />
+                                          {x.text}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                    <p class="mt-3 flex items-center gap-1.5 text-sm font-semibold text-raspberry">
+                                      View program <Icon name="arrow-right" class="size-4" />
+                                    </p>
+                                  </div>
+                                </div>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </td>
+                  ) : (
+                    <td class="border border-border bg-canvas/60" />
+                  ),
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Smaller screens: a small month whose days lead to the list below it. The list is what assistive technology reads. */}
+        <div aria-hidden="true" class="mx-auto max-w-md lg:hidden">
+          <div class="grid grid-cols-7 text-center font-label text-xs font-bold tracking-[0.08em] text-gold-text uppercase">
+            {WEEKDAYS.map((w) => (
+              <span class="py-1">{w.slice(0, 1)}</span>
+            ))}
+          </div>
+          <div class="mt-1 grid grid-cols-7 gap-y-1 text-center">
+            {m.weeks.flat().map((day) => {
+              if (!day) return <span />;
+              const list = byDay.get(iso(day)) ?? [];
+              const number = (
+                <span class="grid size-8 place-items-center rounded-full font-label text-[15px] font-semibold group-data-past/day:text-muted group-data-today/day:bg-raspberry group-data-today/day:text-on-raspberry">
+                  {day.getUTCDate()}
+                </span>
+              );
+              return list.length ? (
+                <a
+                  href={`#day-${iso(day)}`}
+                  tabindex="-1"
+                  data-day={iso(day)}
+                  class="group/day flex h-12 flex-col items-center rounded-lg pt-0.5 text-ink transition-colors hover:bg-canvas"
+                >
+                  {number}
+                  <span class="mt-0.5 flex gap-1">
+                    {list.slice(0, 3).map((s) => (
+                      <span data-area={s.program.data.area} class:list={['size-1.5 rounded-full', TONE[s.program.data.area].dot]} />
+                    ))}
+                  </span>
+                </a>
+              ) : (
+                <span data-day={iso(day)} class="group/day flex h-12 flex-col items-center pt-0.5 text-ink-soft">
+                  {number}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+
+        <div class="lg:hidden">
+          <button
+            type="button"
+            data-cal-earlier
+            hidden
+            class="mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-border bg-canvas px-4 text-[15px] font-medium text-raspberry transition-colors hover:border-gold"
+          >
+            <Icon name="chevron-down" class="size-4" />
+            <span data-cal-earlier-text>Show earlier sessions</span>
+          </button>
+          <ol class="mt-6 space-y-6">
+            {m.days.map((day) => (
+              <li id={`day-${iso(day)}`} data-day={iso(day)} data-agenda-day class="group/day scroll-mt-6">
+                <p class="flex items-center gap-2 font-label text-[13px] font-bold tracking-[0.06em] text-gold-text uppercase group-data-past/day:text-muted">
+                  {longDay.format(day)}
+                  <span class="hidden rounded-full bg-raspberry px-2 py-0.5 text-[11px] tracking-[0.04em] text-on-raspberry group-data-today/day:inline">
+                    Today
+                  </span>
+                </p>
+                <ul class="mt-2 space-y-2">
+                  {byDay.get(iso(day))!.map((s) => {
+                    const d = s.program.data;
+                    return (
+                      <li data-area={d.area} data-session>
+                        <a
+                          href={programHref(s.program)}
+                          class:list={[
+                            'flex gap-4 rounded-lg border-l-[3px] px-4 py-3 transition-colors group-data-past/day:opacity-60',
+                            TONE[d.area].chip,
+                          ]}
+                        >
+                          <span class="w-[4.75rem] shrink-0 pt-0.5 font-label text-sm font-semibold text-ink">{s.short}</span>
+                          <span class="min-w-0">
+                            <span class="block leading-snug font-semibold text-raspberry">{d.title}</span>
+                            <span class="mt-0.5 block text-sm leading-snug text-ink-soft">
+                              {[s.label, s.place ?? d.format].filter(Boolean).join(' · ')}
+                            </span>
+                          </span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <p data-cal-empty hidden={m.total > 0} class="mt-6 rounded-card border border-border bg-canvas p-6 text-center text-ink-soft">
+          No sessions in {m.title.split(' ')[0]} yet.{' '}
+          <a href="/contact/?inquiry=interest-list" data-interest class="font-semibold text-raspberry underline decoration-gold underline-offset-4 hover:decoration-raspberry">
+            Join the interest list
+          </a>{' '}
+          to hear when programs open.
+        </p>
+      </div>
+    ))
+  }
+</div>
+
+<script>
+  // Shows the visitor's month and the next of the months the site was built
+  // with, marks today and the days before it (in Houston's time), and filters
+  // sessions by area. Without it, the first month shows, unmarked.
+  const houston = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const plural = (n: number) => `${n} ${n === 1 ? 'session' : 'sessions'}`;
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-calendar]')) {
+    const today = houston.format(new Date());
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-cal-month]')];
+    const keys = panels.map((p) => p.dataset.calMonth!);
+    const month = today.slice(0, 7);
+    const first = month < keys[0]! ? 0 : month > keys.at(-1)! ? keys.length - 1 : keys.indexOf(month);
+    const last = Math.min(first + 1, keys.length - 1);
+    const title = root.querySelector<HTMLElement>('[data-cal-title]')!;
+    const total = root.querySelector<HTMLElement>('[data-cal-count]')!;
+    const nav = root.querySelector<HTMLElement>('[data-cal-nav]')!;
+    const [prev, next] = [...nav.querySelectorAll<HTMLButtonElement>('[data-cal-step]')] as [HTMLButtonElement, HTMLButtonElement];
+    const off = new Set<string>();
+    const earlier = new Set<HTMLElement>();
+    let at = first;
+
+    for (const el of root.querySelectorAll<HTMLElement>('[data-day]')) {
+      const day = el.dataset.day!;
+      if (day < today) el.dataset.past = '';
+      if (day === today) {
+        el.dataset.today = '';
+        if (el.matches('td, li')) el.setAttribute('aria-current', 'date');
+      }
+    }
+
+    // Applies the area filter, and on smaller screens folds away the days
+    // already past, then updates the month's count and empty note.
+    const update = () => {
+      for (const el of root.querySelectorAll<HTMLElement>('[data-area]')) el.hidden = off.has(el.dataset.area!);
+      for (const panel of panels) {
+        const days = [...panel.querySelectorAll<HTMLElement>('[data-agenda-day]')];
+        const sessions = (day: HTMLElement) => [...day.querySelectorAll<HTMLElement>('[data-session]')].filter((s) => !s.hidden).length;
+        const past = days.filter((d) => d.dataset.past !== undefined && sessions(d) > 0);
+        const folded = !earlier.has(panel) && past.length < days.filter((d) => sessions(d) > 0).length;
+        for (const day of days) day.hidden = sessions(day) === 0 || (folded && past.includes(day));
+        const button = panel.querySelector<HTMLElement>('[data-cal-earlier]')!;
+        const count = past.reduce((n, d) => n + sessions(d), 0);
+        button.hidden = !folded || count === 0;
+        button.querySelector('[data-cal-earlier-text]')!.textContent = `Show ${count} earlier ${count === 1 ? 'session' : 'sessions'} this month`;
+        const shown = days.reduce((n, d) => n + sessions(d), 0);
+        panel.querySelector<HTMLElement>('[data-cal-empty]')!.hidden = shown > 0;
+        panel.dataset.count = String(shown);
+      }
+      total.textContent = plural(Number(panels[at]!.dataset.count));
+    };
+
+    const show = (i: number) => {
+      at = i;
+      panels.forEach((p, j) => (p.hidden = j !== i));
+      title.textContent = panels[i]!.dataset.title!;
+      prev.disabled = i <= first;
+      next.disabled = i >= last;
+      total.textContent = plural(Number(panels[i]!.dataset.count));
+    };
+
+    for (const button of [prev, next]) {
+      button.addEventListener('click', () => {
+        show(at + (button === next ? 1 : -1));
+        // The button pressed is now disabled at the end of the range, so focus moves to the other one.
+        if (button.disabled) (button === next ? prev : next).focus();
+      });
+    }
+    for (const button of root.querySelectorAll<HTMLButtonElement>('[data-cal-area]')) {
+      button.addEventListener('click', () => {
+        const area = button.dataset.calArea!;
+        const shown = button.getAttribute('aria-pressed') === 'true';
+        button.setAttribute('aria-pressed', String(!shown));
+        if (shown) off.add(area);
+        else off.delete(area);
+        update();
+      });
+    }
+    for (const panel of panels) {
+      const unfold = () => {
+        earlier.add(panel);
+        update();
+      };
+      panel.querySelector('[data-cal-earlier]')!.addEventListener('click', unfold);
+      // A day in the small month leads to its sessions, unfolding them if they are past.
+      for (const link of panel.querySelectorAll<HTMLAnchorElement>('a[href^="#day-"]')) {
+        link.addEventListener('click', () => {
+          if (document.getElementById(link.hash.slice(1))!.hidden) unfold();
+        });
+      }
+    }
+
+    update();
+    show(first);
+    nav.hidden = last === first;
+    root.querySelector<HTMLElement>('[data-cal-filter]')?.removeAttribute('hidden');
+    title.setAttribute('aria-live', 'polite');
+  }
+
+  // Escape hides the details a session shows while pointed at or focused,
+  // until the pointer or focus leaves it (WCAG 1.4.13).
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    for (const item of document.querySelectorAll<HTMLElement>('[data-tip]:hover, [data-tip]:focus-within')) {
+      const tip = item.querySelector<HTMLElement>('[role="tooltip"]')!;
+      tip.hidden = true;
+      const restore = () => (tip.hidden = false);
+      item.addEventListener('pointerleave', restore, { once: true });
+      item.addEventListener('focusout', restore, { once: true });
+    }
+  });
+</script>

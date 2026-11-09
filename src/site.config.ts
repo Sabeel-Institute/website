@@ -92,11 +92,16 @@ export type NavLink = { label: string; href: string };
  */
 export type NavItem = NavLink & { match?: string[]; menu?: NavLink[] };
 
-/** The program areas that have a page, for the Programs menu. */
+/** The program areas that have a page, for the Programs menu, which ends with the calendar. */
 const areaLinks = Object.values(areas).flatMap((area) => (area.href ? [{ label: area.label, href: area.href }] : []));
 
 export const mainNav: NavItem[] = [
-  { label: 'Programs', href: '/programs/', match: ['/past-programs/'], menu: areaLinks },
+  {
+    label: 'Programs',
+    href: '/programs/',
+    match: ['/past-programs/', '/calendar/'],
+    menu: [...areaLinks, { label: 'Calendar', href: '/calendar/' }],
+  },
   { label: 'Hikam Foundations', href: '/hikam-foundations/' },
   { label: 'About', href: '/about/' },
   { label: 'Teachers & Team', href: '/teachers-and-team/' },

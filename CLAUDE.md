@@ -76,6 +76,23 @@
   can stay on a program that has ended. It orders programs with `byStatus`,
   the order of current programs, which places closed and coming-soon ones
   after them, and pinned programs by `homePriority` before that.
+- `getCalendar` (`src/lib/content.ts`) builds `CALENDAR_MONTHS` (3) months
+  from the build's month in America/Chicago, so the build itself depends on
+  the date. `EventCalendar`'s script picks the visitor's month and the next
+  from those, by the same time zone, and marks today and earlier days; a
+  build therefore stays right until its last month begins. `meetings`
+  (`src/lib/schedule.ts`) follows an endless rule only up to the last day
+  built. The visual comparison's fixed clock (2026-01-01, in
+  `engine/before.cjs`) is before every month built, so its screenshots show
+  the build's month with no day marked.
+- A session's details on the large calendar are a `role="tooltip"` the link
+  names with `aria-describedby`, shown on hover or focus by CSS; Escape hides
+  it until the pointer or focus leaves (WCAG 1.4.13). Which side it opens on
+  comes from the day's column and row. Nothing around it may set `opacity`,
+  `transform`, or `z-index`, which would make a stacking context and put it
+  under the next day's cell, so past days dim the link, not the list item.
+  The small month on smaller screens is `aria-hidden`, its links out of the
+  tab order: the list under it holds the same sessions.
 - `src/assets/images/logo.png` is `sabeel-logo.png` from the brand
   repository (`skills/sabeel-brand/logo/`), scaled to 1600 px wide.
   `public/icon-*.png` are its `sabeel-icon.png` design: the calligraphy

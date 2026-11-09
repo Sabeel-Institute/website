@@ -64,10 +64,11 @@ field, including a field the schema does not have.
 | Donations, newsletter | Site settings → Donations, Newsletter |
 | Rename or move a page | Pages and components → Moving or removing a page |
 
-The home page, Programs, the area pages, and Past Programs list programs from
-each program's `status`, and the home page also from its `home` (see Home
-page). Never edit those pages to add, move, or remove a program; the one
-exception is the series of past programs on Youth & Children (see Areas).
+The home page, Programs, the area pages, the calendar, and Past Programs list
+programs from each program's `status`, the home page also from its `home`
+(see Home page), and the calendar from its `schedule` (see Calendar). Never
+edit those pages to add, move, or remove a program; the one exception is the
+series of past programs on Youth & Children (see Areas).
 
 ## How the site is put together
 
@@ -169,10 +170,10 @@ stateDiagram-v2
 
 | `status` | Use when | Shown as | Listed on | Its page offers |
 |---|---|---|---|---|
-| `open` | People can join: registration is open, or none is needed | Registration open, or No registration needed | Home (see Home page), Programs, its area page | Register buttons, unless no registration is needed (see Registration) |
+| `open` | People can join: registration is open, or none is needed | Registration open, or No registration needed | Home (see Home page), Programs, its area page, the calendar | Register buttons, unless no registration is needed (see Registration) |
 | `ongoing` | A series has begun and people can still join | Ongoing series | Same places, after open programs | The same as `open` |
-| `closed` | Registration has closed; the program is still running | Registration closed | “Registration closed” on Programs and its area page; Home when there is room (see Home page) | Join the Interest List |
-| `upcoming` | Announced; registration is not open yet | Coming soon | “Coming soon” on Programs and its area page; Home only with `home: always` | Join the Interest List |
+| `closed` | Registration has closed; the program is still running | Registration closed | “Registration closed” on Programs and its area page; Home when there is room (see Home page); the calendar | Join the Interest List |
+| `upcoming` | Announced; registration is not open yet | Coming soon | “Coming soon” on Programs and its area page; Home only with `home: always`; the calendar | Join the Interest List |
 | `completed` | The program has ended | Program completed | Past Programs | Join the Interest List; kept as a record |
 
 Current programs (open and ongoing) are listed open before ongoing, latest
@@ -265,7 +266,8 @@ not both.
 
 Cards and pages word the schedule themselves: “Sept 14 – Oct 26 · 7
 sessions”, “Mondays · 12:00–1:30 PM CT”, “Last Wednesday of each month”.
-`label` adds your own words to a part's line.
+`label` adds your own words to a part's line. The calendar shows each session
+on its day (see Calendar).
 
 ### Cards
 
@@ -307,6 +309,29 @@ there only with `home: always`; either way it stays on Programs and its area
 page. A program leaves the home page when it is completed, so `home` can stay
 on it. The build stops, naming them, if more programs have `home: always` than
 the home page shows.
+
+### Calendar
+
+The calendar, `/calendar/` (last in the Programs menu), shows the visitor's
+month and the next, with every session of each program that has a
+`schedule` and is not completed: open, ongoing, closed, and coming-soon
+programs alike. Each session sits on its day with its start time, coloured
+by area, and links to its program's page; on a large screen, pointing at it
+or focusing it shows its area, status, date, time, place, and audience. On
+smaller screens, a small month leads to a list of the month's sessions.
+Visitors can hide an area's sessions.
+
+It needs no edit of its own: a program appears, moves, or leaves as its
+`schedule` and `status` change, and a skipped date (`skip`) is not shown. A
+program with only `date` has no sessions to show. A part's `label` appears
+with its time, and its `venue` as its place; other sessions show the
+program's `location`, or its venue. A multi-day event (`end`) shows on each
+of its days.
+
+The site is built with three months, from the month it is built in (Houston
+time), and the visitor's browser picks their month and the next from them
+and marks today. Until the site is next built, a visitor in the last of those
+months sees that month alone.
 
 ### Standard and bespoke pages
 
@@ -704,7 +729,8 @@ Zeffy donation campaign, tax ID, `mailingListAction`, how many programs the
 home page shows (`homeProgramCount`), program areas, and the header
 (`mainNav`) and footer (`footerNav`) menus. A header item's `menu`
 lists the links in its drop-down menu; Programs lists the program areas that
-have a page. Change a value here, never by typing it into a page.
+have a page, then the calendar. Change a value here, never by typing it into
+a page.
 
 #### Newsletter
 
@@ -736,7 +762,7 @@ asks only for the amount and how often to give.
 
 Routes: `/`, `/about/`, `/programs/`, `/programs/<slug>/`,
 `/programs/womens-learning/`, `/programs/youth-children/`,
-`/hikam-foundations/`, `/past-programs/`, `/teachers-and-team/`,
+`/hikam-foundations/`, `/calendar/`, `/past-programs/`, `/teachers-and-team/`,
 `/teachers-and-team/<slug>/`, `/support/`, `/contact/`, `/financial-aid/`, and
 the 404 page.
 
@@ -755,6 +781,7 @@ the 404 page.
 | `FlyerArchive` | Completed programs' flyers, one tab per year; the page also includes `Lightbox` |
 | `AreaPage` | A whole program-area page: Women’s Learning |
 | `AreaPrograms` | An area's programs that are not over: open and ongoing ones by format, then Coming soon and Registration closed |
+| `EventCalendar` | The calendar of sessions, a month at a time (see Calendar) |
 | `TeamCard` | A person |
 | `Photo` | A photo slot (`slot=`) or a specific image (`image=`), with the pattern fallback (never for people; see Photos) |
 | `Collage` | Three photo slots side by side, the same size, with captions |
@@ -769,11 +796,13 @@ the 404 page.
 Queries and helpers in `src/lib/content.ts`: `getCurrentPrograms(area?)`,
 `getUpcomingPrograms(area?)`, `getClosedPrograms(area?)`,
 `getCompletedPrograms(area?)`, `getHomePrograms()` (see Home page),
-`programHref`, `statusLabel` (a program's status as cards and pages show it),
-`STATUS_LABEL`, `programSchedule` (the schedule as cards and pages word it),
-`programLocation`, `firstDay`, `programYear`, `asLines`, `resolveInstructors`,
-`getGalleryPhotos`, `getTeamGroup`, `displayName`, `teamHasPage`, `excerpt`.
-`src/lib/schedule.ts` reads and words schedules.
+`getCalendar()` (see Calendar), `programHref`, `statusLabel` (a program's
+status as cards and pages show it), `STATUS_LABEL`, `programSchedule` (the
+schedule as cards and pages word it), `programLocation`, `firstDay`,
+`programYear`, `asLines`, `resolveInstructors`, `getGalleryPhotos`,
+`getTeamGroup`, `displayName`, `teamHasPage`, `excerpt`.
+`src/lib/schedule.ts` reads and words schedules, and lists the days a part
+meets for the calendar.
 
 **A new page** is a file in `src/pages/` wrapped in `BaseLayout`, opening with
 `PageHero`, with sections that open with `SectionHeading`, and ending with a
