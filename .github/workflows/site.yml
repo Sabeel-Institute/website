@@ -38,7 +38,13 @@ jobs:
 
       - run: npm ci
 
+      # A pull request's build stops on a current program whose last session
+      # was long ago (assertProgramDates in src/lib/content.ts); the build
+      # that deploys main does not, so a merged change goes live whatever the
+      # date.
       - run: npm run build
+        env:
+          CHECK_PROGRAM_DATES: ${{ github.event_name == 'pull_request' }}
 
       - uses: actions/upload-artifact@v7
         with:
@@ -79,6 +85,8 @@ jobs:
       # made for this run.
       - name: Build main
         timeout-minutes: 10
+        env:
+          CHECK_PROGRAM_DATES: false
         run: |
           git worktree add --detach "$RUNNER_TEMP/main" HEAD^1
           cd "$RUNNER_TEMP/main"

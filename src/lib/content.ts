@@ -2,7 +2,8 @@ import type { ImageMetadata } from 'astro';
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { satteri } from '@astrojs/markdown-satteri';
 import { site, type AreaId } from '../site.config';
-import { describeSchedule, type ScheduleText } from './schedule';
+import { describeSchedule, lastDay, type ScheduleText } from './schedule';
+import { EMOJI } from './text';
 
 export type Program = CollectionEntry<'programs'>;
 export type TeamMember = CollectionEntry<'team'>;
@@ -212,6 +213,51 @@ export function assertProgramImages(programs: Program[]): void {
           'Use a 16:9 image, for example 1920 × 1080 px (see Program images in AGENTS.md).',
       );
     }
+  }
+}
+
+/**
+ * Program text has no emoji (see Writing conventions in AGENTS.md): they
+ * look different on every system, and Windows shows a flag as two letters.
+ */
+export function assertProgramText(programs: Program[]): void {
+  for (const p of programs) {
+    const found = [...new Set(`${JSON.stringify(p.data)}\n${p.body ?? ''}`.match(EMOJI) ?? [])];
+    if (found.length) {
+      throw new Error(
+        `Program "${p.id}" has emoji (${found.join(' ')}). Remove them from its fields and text: ` +
+          'the site uses none (see Writing conventions in AGENTS.md).',
+      );
+    }
+  }
+}
+
+/** Days after its last session that a program can still be listed as current. */
+const ENDED_DAYS = 30;
+
+/**
+ * A program that is not completed has sessions within the last
+ * `ENDED_DAYS` days or later: one that ended earlier has dates in the wrong
+ * year, or needs `status: completed`. Pull request and local builds check
+ * it; the live site's build sets CHECK_PROGRAM_DATES=false, so a merged
+ * change deploys whatever the date (see `.github/workflows/site.yml`).
+ */
+export function assertProgramDates(programs: Program[], now = new Date()): void {
+  if (process.env.CHECK_PROGRAM_DATES === 'false') return;
+  // Today in Houston, held as UTC midnight like the schedule's days.
+  const today = new Date(`${now.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' })}T00:00:00Z`);
+  const ended = programs.flatMap((p) => {
+    const last = p.data.status !== 'completed' && p.data.schedule ? lastDay(p.data.schedule) : undefined;
+    return last && (+today - +last) / 86_400_000 > ENDED_DAYS ? [{ p, last }] : [];
+  });
+  if (ended.length) {
+    const when = new Intl.DateTimeFormat('en-US', { dateStyle: 'full', timeZone: 'UTC' });
+    throw new Error(
+      ended
+        .map(({ p, last }) => `Program "${p.id}" is ${p.data.status}, but its last session was ${when.format(last)}, more than ${ENDED_DAYS} days ago.`)
+        .join('\n') +
+        '\nIf a program has ended, set its status to completed; if not, check the year of its dates (see Status in AGENTS.md).',
+    );
   }
 }
 
