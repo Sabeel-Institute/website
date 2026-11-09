@@ -2,17 +2,13 @@
 status: completed
 title: Race to Jannah
 subtitle: A BoxCar Adventure
-summary: Build your own wearable boxcar, race through fun challenges and discover how Niyyah, Sabr, Salah, Dhikr, Shukr and good Akhlaq help us on our journey to Jannah! A hands-on Islamic adventure filled with stories, games, crafts, and teamwork!
+summary: Build your own wearable boxcar, race through fun challenges and discover how Niyyah, Sabr, Salah, Dhikr, Shukr and good Akhlaq help us on our journey to Jannah!
 area: youth-children
 schedule:
   - start: 2026-11-01
     time: 2:30–4:30 PM
-  - start: 2026-11-08
-    time: 2:30–4:30 PM
-card:
-  - Nov 01 and Nov 08
-  - Sundays · 2:30–4:30 PM CT
-audience: Children 6–10 years old
+    repeat: FREQ=WEEKLY;BYDAY=SU;COUNT=2
+audience: Children 6–10
 format: On-site
 venue: masjid-istiqlal
 location: Sabeel Classroom at Masjid Istiqlal
