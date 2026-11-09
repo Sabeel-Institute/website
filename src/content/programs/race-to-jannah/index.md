@@ -1,5 +1,5 @@
 ---
-status: closed
+status: completed
 title: Race to Jannah
 subtitle: A BoxCar Adventure
 summary: Build your own wearable boxcar, race through fun challenges and discover how Niyyah, Sabr, Salah, Dhikr, Shukr and good Akhlaq help us on our journey to Jannah! A hands-on Islamic adventure filled with stories, games, crafts, and teamwork!
