@@ -11,6 +11,7 @@ export default defineConfig({
   trailingSlash: 'ignore',
   build: { format: 'directory' },
   image: { layout: 'constrained' },
-  integrations: [sitemap()],
+  // The staff guide (src/pages/course-guide-*.astro) is unlisted.
+  integrations: [sitemap({ filter: (page) => !/\/course-guide-[a-z0-9]+\/$/.test(page) })],
   vite: { plugins: [tailwindcss()] },
 });

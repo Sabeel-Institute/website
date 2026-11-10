@@ -94,13 +94,24 @@
   `@astrojs/markdown-satteri`, a direct dependency at the version Astro
   uses), so they format like the body. A heading in either fails the build
   there, from the rendered HTML, which catches every heading syntax.
-- `docs/course-guide.md` is the staff guide to the program template. Its
-  pictures in `docs/course-guide/` are WebP screenshots of the built site,
-  taken with Playwright at twice the pixel density, with the numbered
-  markers drawn into the page before each capture. States no program is in
-  (Coming soon, No registration needed, no form yet) come from a scratch copy
-  with sample settings, and the guide says so. The same guide is published
-  as a page for staff, which is updated from it.
+- The staff guide, `src/pages/course-guide-yild5ztlpf.astro`, is unlisted:
+  the sitemap's `filter` in `astro.config.mjs` leaves it out, it sets
+  `noindex, nofollow`, and nothing links to it. The repository is public,
+  so its address is unlisted, not secret. It stands alone, without
+  `BaseLayout` or `global.css`: Tailwind's preflight would take away the
+  paragraph spacing, list markers, and link underlines its own CSS relies
+  on. `@source not` in `global.css` keeps Tailwind from reading its words,
+  so editing it leaves the site's stylesheet, and every other page's HTML,
+  unchanged. Its colours and fonts are the site's tokens, read from the
+  `@theme` block of `global.css` (`?raw`) while it builds, under short local
+  names; the build fails naming a token that `@theme` no longer defines. It
+  loads the fonts with the same Fontsource packages. Its pictures in
+  `src/assets/course-guide/` are WebP screenshots of the built site, taken
+  with Playwright at twice the pixel density, with the numbered markers
+  drawn into the page before each capture; desktop captures are taken at
+  1440 px wide and scaled to 1600 px. States no program is in (Coming soon,
+  No registration needed, no form yet) come from a scratch copy with sample
+  settings, and the guide says so.
 - `draft: true` programs are left out by `withStatus`, which every listing
   query uses, and by `getStaticPaths` in `programs/[slug].astro`, so they get
   no page and no listing. Drafts skip the bespoke-page and image checks.

@@ -3,9 +3,8 @@
 Read this whole file before changing anything. It explains how the site is
 built, the conventions every change follows, and how to keep changes easy to
 review and merge. Deployment has its own guide: [docs/deployment.md](docs/deployment.md).
-Staff who ask you for changes learn what a program can show from
-[docs/course-guide.md](docs/course-guide.md), so their requests use its
-words.
+Staff who ask you for changes learn what a program can show from the staff
+guide (see Staff guide), so their requests use its words.
 
 ## What this is
 
@@ -67,6 +66,7 @@ change; change that, never the check.
 | Change contact details, links, or menus | Site settings |
 | Donations, newsletter | Site settings → Donations, Newsletter |
 | Rename or move a page | Pages and components → Moving or removing a page |
+| The staff guide to what a program can show | Pages and components → Staff guide |
 
 The home page, Programs, the area pages, and Past Programs list programs from
 each program's `status`, and the home page also from its `home` (see Home
@@ -831,8 +831,9 @@ asks only for the amount and how often to give.
 Routes: `/`, `/about/`, `/programs/`, `/programs/<slug>/`,
 `/programs/womens-learning/`, `/programs/youth-children/`,
 `/hikam-foundations/`, `/past-programs/`, `/teachers-and-team/`,
-`/teachers-and-team/<slug>/`, `/support/`, `/contact/`, `/financial-aid/`, and
-the 404 page.
+`/teachers-and-team/<slug>/`, `/support/`, `/contact/`, `/financial-aid/`, the
+404 page, and the unlisted staff guide, `/course-guide-yild5ztlpf/` (see Staff
+guide).
 
 | Component | Use for |
 |---|---|
@@ -888,6 +889,27 @@ pages, and its donation pages to Support. Firebase applies redirects before
 serving pages, so a redirect's `source` must never be the address of a page
 on this site, and a page that a redirect leads to keeps its address or gets
 a redirect of its own.
+
+### Staff guide
+
+The staff guide, `src/pages/course-guide-yild5ztlpf.astro`, shows staff
+everything a program can show and what to ask an agent for, with annotated
+screenshots of the site. It is on the site at
+`https://oursabeel.com/course-guide-yild5ztlpf/` and unlisted: never link to
+it from a page, a menu, or the footer. Staff have the link.
+
+Update it in the same pull request whenever what a program can show changes:
+a field, the program page, its card, the listings, how dates are worded, or
+how people register. Change its wording where the change shows, and retake
+every picture that shows something different (see the staff guide notes in
+CLAUDE.md for how they are taken). Its pictures are in
+`src/assets/course-guide/`; it shows each one by name with `shot('<name>')`.
+
+It is a page of its own: no `BaseLayout` and no site stylesheet. Its styles
+are in the page, built on the site's colour and font tokens, so keep its
+look, its sections, and their order as they are; add to them in the same
+style. It is structural, like every page, so only the admin merges a change
+to it.
 
 ## Design rules
 
@@ -974,7 +996,7 @@ Keep every change easy to review and merge:
 4. **Do not commit** screenshots, notes, scratch files, `dist/`,
    `node_modules/`, or `.astro/`. Put screenshots in the pull-request
    description instead. The one exception is the staff guide's pictures in
-   `docs/course-guide/`.
+   `src/assets/course-guide/`.
 5. **Leave deployment alone** (`.github/workflows/`, `firebase.json` hosting
    settings, `.firebaserc`, `scripts/visual-diff/`) unless the task is about
    deploying; see docs/deployment.md. Adding a redirect for a moved page to
@@ -982,9 +1004,8 @@ Keep every change easy to review and merge:
 6. **Update docs with the change.** If you add a field, component, page, or
    convention, update this file in the same pull request. If you change what
    a program can show (a field, the program page, its card, or the
-   listings), also update the staff guide,
-   [docs/course-guide.md](docs/course-guide.md), and retake the pictures it
-   shows.
+   listings), also update the staff guide and retake the pictures it shows
+   (see Staff guide).
 7. **Verify** (below), then open a pull request that says what changed and
    why. A few minutes after its build passes, every pull request gets a
    comment with a preview link and a **Visual changes** line.
@@ -1009,7 +1030,8 @@ the paths `.github/CODEOWNERS` leaves without an owner:
 
 Any member of the organization can merge a routine pull request once its
 checks pass. Any other file makes it **structural**: pages (including the
-Youth & Children series lists), components, layouts, styles, the schemas,
+Youth & Children series lists and the staff guide), components, layouts,
+styles, the schemas,
 `src/site.config.ts`, `firebase.json` (redirects included), workflows,
 scripts, packages, and the docs. `.github/CODEOWNERS` makes the repository
 admin the owner of those files. The Change scope workflow
