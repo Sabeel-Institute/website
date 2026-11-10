@@ -1,0 +1,980 @@
+---
+/**
+ * The staff guide to the program template: what a course can show, and what
+ * to ask an agent for. Unlisted: nothing on the site links to it, the
+ * sitemap leaves it out, and it asks search engines not to index it. It
+ * stands alone, without BaseLayout or the site's stylesheet, and takes the
+ * site's colour and font tokens from global.css (see CLAUDE.md).
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import '@fontsource/cormorant-garamond/600.css';
+import '@fontsource/cormorant-garamond/700.css';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/dm-sans';
+import globalCss from '../styles/global.css?raw';
+
+/** The tokens this page uses, as global.css's @theme block defines them. */
+const TOKENS = [
+  'color-canvas', 'color-surface', 'color-inset', 'color-sage', 'color-sage-mist', 'color-ink', 'color-ink-soft',
+  'color-raspberry', 'color-raspberry-deep', 'color-on-raspberry', 'color-gold', 'color-gold-text', 'color-border',
+  'font-display', 'font-sans', 'font-label',
+];
+const theme = new Map(
+  [...(/@theme\s*\{([\s\S]*?)\n\}/.exec(globalCss)?.[1] ?? '').matchAll(/^\s*--([a-z0-9-]+):\s*([^;]+);/gm)].map((m) => [m[1]!, m[2]!]),
+);
+const missing = TOKENS.filter((t) => !theme.has(t));
+if (missing.length) throw new Error(`The course guide uses tokens global.css's @theme no longer defines: ${missing.join(', ')}.`);
+const rootTokens = `:root { ${TOKENS.map((t) => `--${t}: ${theme.get(t)};`).join(' ')} }`;
+
+const pictures = import.meta.glob<{ default: ImageMetadata }>('../assets/course-guide/*.webp', { eager: true });
+/** A screenshot from src/assets/course-guide/, at half and full width. */
+function shot(name: string) {
+  const picture = pictures[`../assets/course-guide/${name}.webp`]?.default;
+  if (!picture) throw new Error(`The course guide shows src/assets/course-guide/${name}.webp, which does not exist.`);
+  return { src: picture, widths: [Math.round(picture.width / 2), picture.width] };
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Sabeel Course Page Guide</title>
+    <meta name="theme-color" content={theme.get('color-canvas')} />
+    <link rel="icon" href="/icon-32.png" sizes="32x32" />
+    <link rel="icon" href="/icon-192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/icon-180.png" />
+    <style is:inline set:html={rootTokens}></style>
+  </head>
+  <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-cal" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  </svg>
+  
+  <div class="wrap">
+    <nav class="toc" aria-label="Contents">
+      <p>Contents</p>
+      <ol>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#stages">Stages</a></li>
+        <li><a href="#card">The course card</a></li>
+        <li><a href="#home">The home page</a></li>
+        <li><a href="#page">The course page</a></li>
+        <li><a href="#dates">Dates and times</a></li>
+        <li><a href="#fees">Prices</a></li>
+        <li><a href="#registration">Registration</a></li>
+        <li><a href="#place">Where it meets</a></li>
+        <li><a href="#pictures">Pictures</a></li>
+        <li><a href="#text">Kinds of text</a></li>
+        <li><a href="#everyday">Everyday requests</a></li>
+        <li><a href="#checklist">New course checklist</a></li>
+        <li><a href="#fixed">What stays the same</a></li>
+        <li><a href="#check">Checking a change</a></li>
+        <li><a href="#words">Your agent’s words</a></li>
+      </ol>
+    </nav>
+  
+    <main>
+      <header class="intro">
+        <p class="eyebrow">For Sabeel staff</p>
+        <h1>Sabeel Course Page Guide</h1>
+        <div class="divider"><span></span></div>
+        <p class="lead">Everything a course can show on the website, and what you can ask your agent to change. Read it once, then use it to describe what you want.</p>
+      </header>
+  
+      <!-- How it works -->
+      <section class="part" id="how">
+        <p class="eyebrow">Start here</p>
+        <h2>How it works</h2>
+        <div class="divider"><span></span></div>
+        <p>Every course on the website comes from one place: the course’s own information, kept in its folder with its flyer and picture. Nobody edits the pages themselves. When the information changes, every place the course appears changes with it.</p>
+        <p>You don’t edit the information yourself either. You tell your agent what you want, in plain words. The agent knows the website’s rules, makes the change, and sends it for review with a preview you can click through.</p>
+        <div class="flow" role="img" aria-label="You tell your agent; the agent updates the course information; the website builds the course page, its card, its place in lists, the archive, and link previews from it.">
+          <div class="flow-steps">
+            <div class="node you">You<small>say what you want</small></div>
+            <div class="node">Your agent<small>updates the course information</small></div>
+          </div>
+          <div class="arrow" aria-hidden="true">→</div>
+          <div class="outputs">
+            <div class="node">The course page<small>its own page with every detail</small></div>
+            <div class="node">The course card<small>Home, Programs, and its area page</small></div>
+            <div class="node">Lists on Programs<small>Coming soon, Registration closed</small></div>
+            <div class="node">Past Programs<small>the flyer archive, by year</small></div>
+            <div class="node">Link previews<small>when shared on WhatsApp or by email</small></div>
+            <div class="node">A future calendar<small>the dates are stored ready for one</small></div>
+          </div>
+        </div>
+        <div class="rule">
+          <div class="tag">Good to know</div>
+          The website calls courses <b>programs</b> (the Programs menu, Past Programs). This guide says courses. Your agent understands both.
+        </div>
+      </section>
+  
+      <!-- Stages -->
+      <section class="part" id="stages">
+        <p class="eyebrow">Where a course shows up</p>
+        <h2>A course’s stage decides where it appears</h2>
+        <div class="divider"><span></span></div>
+        <p>Each course is at one stage. The stage puts the course in the right lists and chooses its buttons. It never changes by itself on a date: when registration closes or the course ends, ask your agent to change it.</p>
+        <div class="stages">
+          <div class="stage"><p class="eyebrow">Coming soon</p><p><b>Shows in</b> the Coming soon list on Programs and on its area page, and on the home page only if you ask (see <a href="#home">The home page</a>).</p><p><b>Main button:</b> Join the Interest List.</p></div>
+          <div class="stage"><p class="eyebrow">Registration open</p><p><b>Shows on</b> the home page (see <a href="#home">The home page</a>), Programs, and its area page.</p><p><b>Buttons:</b> Register and Ask a Question.</p></div>
+          <div class="stage"><p class="eyebrow">No registration needed</p><p>An open course anyone can just come to. <b>Shows in</b> the same places.</p><p><b>Main button:</b> Ask a Question.</p></div>
+          <div class="stage"><p class="eyebrow">Ongoing series</p><p>Already started, still taking people. <b>Shows</b> after the open courses.</p><p><b>Buttons:</b> Register and Ask a Question.</p></div>
+          <div class="stage"><p class="eyebrow">Registration closed</p><p>Still running, no longer taking people. <b>Shows in</b> the Registration closed list, and on the home page when there is room.</p><p><b>Main button:</b> Join the Interest List.</p></div>
+          <div class="stage"><p class="eyebrow">Program completed</p><p>Finished. <b>Moves to</b> Past Programs. The page stays as a record, and shared links keep working.</p><p><b>Main button:</b> Join the Interest List.</p></div>
+        </div>
+        <div class="say">
+          <div class="tag"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Tell your agent</div>
+          <ul>
+            <li>Open registration for [course name].</li>
+            <li>Close registration for [course name]; the course is still running.</li>
+            <li>[Course name] has finished. Move it to past programs.</li>
+          </ul>
+        </div>
+      </section>
+  
+      <!-- Card -->
+      <section class="part" id="card">
+        <p class="eyebrow">On Home, Programs, and area pages</p>
+        <h2>The course card</h2>
+        <div class="divider"><span></span></div>
+        <p>Every current course gets the same card, so visitors can compare them at a glance. The lines always come in the same order.</p>
+        <figure class="shot side">
+          <div class="frame"><Image {...shot('card')} alt="A course card for Mommy Burnout with numbered markers on each part: picture, stage and area, title, audience, dates, days and time, format, and the View Details button." sizes="(min-width: 1000px) 510px, (min-width: 900px) 52vw, calc(100vw - 32px)" /></div>
+          <figcaption>
+            <ol class="legend">
+              <li><span class="num">1</span><div><b>Picture.</b> The course’s wide picture. Without one, the card has no picture. <span class="opt">Optional</span></div></li>
+              <li><span class="num">2</span><div><b>Stage and area.</b> <span class="auto">Automatic</span></div></li>
+              <li><span class="num">3</span><div><b>Title.</b> As on the flyer.</div></li>
+              <li><span class="num">4</span><div><b>Who it’s for.</b> Your words: “Adult women”, “Boys 12–16 · Girls 13+”. <span class="opt">Optional</span></div></li>
+              <li><span class="num">5</span><div><b>Dates and how many sessions.</b> Written from the dates you give; up to four sessions are listed by date (“Nov 7, Nov 21, Dec 5 &amp; Dec 19”). <span class="auto">Automatic</span></div></li>
+              <li><span class="num">6</span><div><b>Days and time.</b> One line for each part of the schedule. <span class="auto">Automatic</span></div></li>
+              <li><span class="num">7</span><div><b>Online, On-site, or Online &amp; on-site.</b> Also decides which group the card sits in on Programs.</div></li>
+              <li><span class="num">8</span><div><b>View Details.</b> Opens the course page.</div></li>
+            </ol>
+          </figcaption>
+        </figure>
+        <div class="rule">
+          <div class="tag">When only the year is known</div>
+          A course announced before its dates shows “Starts 2027” in place of lines 5 and 6, or one or two short lines of your own, such as “2 years · Starts 2027”. Once a course has dates, the card always shows them as the site writes them.
+          <div class="word-line">Your agent’s word: <span class="word">card</span></div>
+        </div>
+        <div class="sub">
+          <h3>How the cards are arranged</h3>
+          <p>Programs and the area pages group current courses by where they meet: Online, On-site, and Online &amp; on-site. Within a group, open courses come first, then ongoing ones, newest start first.</p>
+          <figure class="shot">
+            <div class="frame"><Image {...shot('listing')} alt="The Online group on the Programs page: a heading marked 1 and three course cards, the first marked 2." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div>
+            <figcaption>
+              <ol class="legend">
+                <li><span class="num">1</span><div><b>The group</b>, with how many courses it holds. <span class="auto">Automatic</span></div></li>
+                <li><span class="num">2</span><div><b>A course card.</b> Programs shows every current course; the home page shows up to three (see <a href="#home">The home page</a>).</div></li>
+              </ol>
+            </figcaption>
+          </figure>
+          <p>Courses that are coming soon or have closed registration appear as one line each, with their dates:</p>
+          <figure class="shot">
+            <div class="frame"><Image {...shot('rows')} alt="The Coming soon and Registration closed lists on Programs, each line showing a course title, its area, and its dates." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div>
+            <figcaption>
+              <ol class="legend" start="3">
+                <li><span class="num">3</span><div><b>Coming soon.</b> Title, area, and dates, or your own card lines (here “2 years · Starts 2027”).</div></li>
+                <li><span class="num">4</span><div><b>Registration closed.</b> Title, area, and dates, with how many sessions, or each date for up to four.</div></li>
+              </ol>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+  
+      <!-- Home page -->
+      <section class="part" id="home">
+        <p class="eyebrow">Which courses it shows</p>
+        <h2>The home page</h2>
+        <div class="divider"><span></span></div>
+        <p>The home page shows up to three course cards. A course leaves it by itself when it is completed.</p>
+        <div class="split">
+          <div class="panel">
+            <h3>Chosen in this order</h3>
+            <ol>
+              <li>Courses you have asked to <b>always show</b> on the home page, whatever their stage. When there are several, you can set their order with a number from 0 to 100: the highest comes first.</li>
+              <li>Then courses with <b>registration open</b>, then <b>ongoing series</b>, then courses whose <b>registration has closed</b>, newest start first.</li>
+            </ol>
+          </div>
+          <div class="panel">
+            <h3>Also possible</h3>
+            <ul>
+              <li><b>A Coming soon course</b> appears there only when you ask for it.</li>
+              <li><b>Keep a course off</b> the home page. It still appears on Programs and its area page.</li>
+              <li>If more courses are set to always show than there is room for, the <b>build</b> check fails and names them.</li>
+            </ul>
+            <p class="muted" style="font-size:15px;margin:12px 0 0">How many courses the home page shows is a site setting the administrator changes.</p>
+          </div>
+        </div>
+        <div class="say">
+          <div class="tag"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Tell your agent</div>
+          <ul>
+            <li>Always show [course name] on the home page.</li>
+            <li>Keep [course name] off the home page.</li>
+            <li>Show [course name] first among the courses that always show.</li>
+            <li>Let the home page choose for [course name] again.</li>
+          </ul>
+        </div>
+        <div class="word-line">Your agent’s words: <span class="word">home</span>, and <span class="word">homePriority</span> for the order.</div>
+      </section>
+  
+      <!-- Page -->
+      <section class="part" id="page">
+        <p class="eyebrow">Every course’s own page</p>
+        <h2>The course page</h2>
+        <div class="divider"><span></span></div>
+        <p>The page is built from the course’s information, top to bottom, in a fixed order. This section shows every part that can appear. Many are optional: leave one out and it is not shown at all, with no empty space left behind, so a short course gets a short page.</p>
+        <div class="key"><span><span class="opt">Optional</span> shown only when you give it</span><span><span class="auto">Automatic</span> written by the site</span><span>No tag: every current course has it</span></div>
+  
+        <div class="sub">
+          <h3>The top of the page</h3>
+          <figure class="shot">
+            <div class="frame"><Image {...shot('top')} alt="The top of the Race to Jannah page with numbered markers: stage and area, title, subtitle, summary, highlight line, Register button, Ask a Question button, and picture." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div>
+            <figcaption>
+              <ol class="legend">
+                <li><span class="num">1</span><div><b>Stage and area.</b> <span class="auto">Automatic</span></div></li>
+                <li><span class="num">2</span><div><b>Title.</b></div></li>
+                <li><span class="num">3</span><div><b>Subtitle</b>, a short tagline. <span class="opt">Optional</span></div></li>
+                <li><span class="num">4</span><div><b>Summary.</b> One sentence: what people will learn and why it matters. It is also the text people see when the link is shared on WhatsApp or by email.</div></li>
+                <li><span class="num">5</span><div><b>Highlight line</b>, in bold above the buttons: an early-bird price, limited seats, a new date. It disappears once registration closes. <span class="opt">Optional</span></div></li>
+                <li><span class="num">6</span><div><b>Register.</b> What it opens depends on how people register (see <a href="#registration">Registration</a>).</div></li>
+                <li><span class="num">7</span><div><b>Ask a Question.</b> Opens the contact form with the course’s name already filled in.</div></li>
+                <li><span class="num">8</span><div><b>Picture.</b> The same wide picture as the card. Without one, a patterned panel takes its place. <span class="opt">Optional</span></div></li>
+              </ol>
+            </figcaption>
+          </figure>
+          <p style="margin-top:26px">The label and the buttons change with the stage and with how people register:</p>
+          <div class="pair">
+            <figure>
+              <div class="frame"><Image {...shot('top-soon')} alt="The top of a course page in the Coming soon stage: the label reads Coming soon (1) and the main button is Join the Interest List (2)." sizes="(min-width: 1000px) 448px, (min-width: 760px) 48vw, calc(100vw - 32px)" /></div>
+              <figcaption class="sample"><b>Coming soon:</b> (1) the label, and (2) Join the Interest List in place of Register. Shown with a course set to Coming soon as a sample.</figcaption>
+            </figure>
+            <figure>
+              <div class="frame"><Image {...shot('top-noreg')} alt="The top of a course page that needs no registration: the label reads No registration needed (1) and the only button is Ask a Question (2)." sizes="(min-width: 1000px) 448px, (min-width: 760px) 48vw, calc(100vw - 32px)" /></div>
+              <figcaption class="sample"><b>No registration needed:</b> (1) the label, and (2) Ask a Question as the only button. Shown with a course set to need no registration as a sample.</figcaption>
+            </figure>
+          </div>
+        </div>
+  
+        <div class="sub">
+          <h3>The facts</h3>
+          <p>Every fact someone needs to decide sits in one block under the top of the page.</p>
+          <figure class="shot">
+            <div class="frame"><Image {...shot('facts')} alt="The facts block on the Race to Jannah page: Audience, Dates with 2 days, Schedule, Location with a map link, and Fee with two prices and a Financial aid link." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div>
+            <div class="frame"><Image {...shot('facts-free')} alt="The facts block on the Anchored Hearts page, showing a free fee and a registration deadline marked 6." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div>
+            <figcaption>
+              <ol class="legend">
+                <li><span class="num">1</span><div><b>Audience.</b> Who it’s for, in your words. <span class="opt">Optional</span></div></li>
+                <li><span class="num">2</span><div><b>Dates</b>, with how many sessions or days. <span class="auto">Automatic</span></div></li>
+                <li><span class="num">3</span><div><b>Schedule</b>: days and time, one line for each part. <span class="auto">Automatic</span></div></li>
+                <li><span class="num">4</span><div><b>Location</b>, in your words, with the address linked to a map for places the site knows (see <a href="#place">Where it meets</a>). <span class="opt">Optional</span></div></li>
+                <li><span class="num">5</span><div><b>Fee</b>, one line or several, with “Need help with the fee? Financial aid” under it while people can join (see <a href="#fees">Prices</a>). <span class="opt">Optional</span></div></li>
+                <li><span class="num">6</span><div><b>Registration deadline.</b> It disappears once registration closes. <span class="opt">Optional</span></div></li>
+              </ol>
+            </figcaption>
+          </figure>
+        </div>
+  
+        <div class="sub">
+          <h3>About this program</h3>
+          <p>The middle of the page takes one of three layouts, chosen automatically from what the course has. The flyer has no separate heading or caption; click the flyer or “Enlarge” to open a larger version.</p>
+          <p><b>1. With points for “What students will learn”.</b> The writing leads, and the flyer stays beside it as the reader scrolls:</p>
+          <figure class="shot">
+            <div class="frame"><Image {...shot('about-text')} alt="The About this program section of Mommy Burnout: What students will learn, an Instructors card, a What to expect card, the start of Program details, and the flyer beside them." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div>
+            <figcaption>
+              <ol class="legend">
+                <li><span class="num">1</span><div><b>What students will learn.</b> Three to five short points. <span class="opt">Optional</span></div></li>
+                <li><span class="num">2</span><div><b>Instructor card.</b> See <a href="#cards">the cards</a> below. <span class="opt">Optional</span></div></li>
+                <li><span class="num">3</span><div><b>What to expect card.</b> See <a href="#cards">the cards</a> below. <span class="opt">Optional</span></div></li>
+                <li><span class="num">4</span><div><b>Program details.</b> Your longer write-up, as long as you like, with headings, bullet points, bold, and links. Good for a session-by-session list, “This course may be for you if…”, or speaker bios. <span class="opt">Optional</span></div></li>
+                <li><span class="num">5</span><div><b>Flyer.</b> Click to enlarge. <span class="opt">Optional</span></div></li>
+              </ol>
+            </figcaption>
+          </figure>
+          <p><b>2. With a longer write-up but no points.</b> The write-up leads under the heading “What to know”, then the cards, with the flyer beside them:</p>
+          <figure class="shot">
+            <div class="frame"><Image {...shot('about-know')} alt="The About this program section of Anchored Hearts: the write-up under What to know, then Instructors and What to expect cards, with the flyer beside them." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div>
+            <figcaption>
+              <ol class="legend">
+                <li><span class="num">1</span><div><b>What to know.</b> The longer write-up, with all its formatting.</div></li>
+                <li><span class="num">2</span><div><b>Instructor card.</b> <span class="opt">Optional</span></div></li>
+                <li><span class="num">3</span><div><b>What to expect card.</b> <span class="opt">Optional</span></div></li>
+                <li><span class="num">4</span><div><b>Flyer.</b> Click to enlarge. <span class="opt">Optional</span></div></li>
+              </ol>
+            </figcaption>
+          </figure>
+          <p><b>3. With neither.</b> The flyer leads, and the cards sit beside it:</p>
+          <figure class="shot">
+            <div class="frame"><Image {...shot('about-flyer')} alt="The About this program section of the investing workshop: the flyer large on the left, with Instructor and What to expect cards beside it." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div>
+            <figcaption>
+              <ol class="legend">
+                <li><span class="num">1</span><div><b>Flyer</b>, large. Click to enlarge.</div></li>
+                <li><span class="num">2</span><div><b>Instructor card.</b> <span class="opt">Optional</span></div></li>
+                <li><span class="num">3</span><div><b>What to expect card.</b> <span class="opt">Optional</span></div></li>
+              </ol>
+            </figcaption>
+          </figure>
+        </div>
+  
+        <div class="sub" id="cards">
+          <h3>The cards</h3>
+          <p>Up to three short cards, in every layout. Each one appears only when you give it; leave it out and the card is gone. In the first two layouts, two cards sit side by side and a third takes the whole row, as here; in the third, they stack beside the flyer.</p>
+          <figure class="shot side">
+            <div class="frame"><Image {...shot('cards3')} alt="Three cards from the Hikam Foundations 2024 page: Instructors, What to expect, and Policies." sizes="(min-width: 1000px) 510px, (min-width: 900px) 52vw, calc(100vw - 32px)" /></div>
+            <figcaption>
+              <ol class="legend">
+                <li><span class="num">1</span><div><b>Instructor</b>, or <b>Instructors</b> for more than one. Team members link to their bio page when they have one; guest speakers get their name, role, and up to three short lines. <span class="opt">Optional</span></div></li>
+                <li><span class="num">2</span><div><b>What to expect.</b> How the course runs, the activities, and anything to bring or know first. <span class="opt">Optional</span></div></li>
+                <li><span class="num">3</span><div><b>Policies.</b> Attendance, refunds, recording, safeguarding. <span class="opt">Optional</span></div></li>
+              </ol>
+              <div class="rule" style="margin-top:18px">
+                <div class="tag">Formatting</div>
+                What to expect and Policies can have paragraphs, bullet points, numbered lists, bold, italics, and links. They can’t have headings: each card already has its own title.
+              </div>
+            </figcaption>
+          </figure>
+          <figure class="shot side">
+            <div class="frame" style="max-width:380px"><Image {...shot('expect-formatted')} alt="The What to expect card on Raising with Purpose: a sentence, then three bullet points with bold names: Nourish, Connect, and Create." sizes="380px" /></div>
+            <figcaption>Raising with Purpose’s What to expect: a sentence, then a bulleted list with each part’s name in bold. Ask for it in plain words: <q>Make the three parts a bulleted list, with their names in bold.</q></figcaption>
+          </figure>
+        </div>
+  
+        <div class="sub">
+          <h3>The closing band</h3>
+          <figure class="shot">
+            <div class="frame"><Image {...shot('closing')} alt="The closing band on the Race to Jannah page: Ready to join?, the dates, format and prices, and a Register Now button." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div>
+            <figcaption>
+              <ol class="legend">
+                <li><span class="num">1</span><div><b>The heading changes with the stage:</b> “Ready to join?”, “Registration opens soon.”, “Coming soon.”, or “Interested in a future offering?”. <span class="auto">Automatic</span></div></li>
+                <li><span class="num">2</span><div><b>The key facts again</b>: dates, format, and fee. <span class="auto">Automatic</span></div></li>
+                <li><span class="num">3</span><div><b>Register Now</b>, or Ask a Question, or Join the Interest List, by stage.</div></li>
+              </ol>
+            </figcaption>
+          </figure>
+          <p style="margin-top:26px">Every version of the band:</p>
+          <div class="stack">
+            <figure><div class="frame"><Image {...shot('closing-noreg')} alt="Closing band for a course that needs no registration: Ready to join?, No registration needed and the key facts, and an Ask a Question button." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div><figcaption class="sample"><b>Open, no registration needed:</b> “No registration needed” leads the facts, and the button is Ask a Question. (Sample settings.)</figcaption></figure>
+            <figure><div class="frame"><Image {...shot('closing-soon')} alt="Closing band for a course that is coming soon: Registration opens soon., with Join the Interest List and Ask a Question buttons." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div><figcaption class="sample"><b>Coming soon:</b> “Registration opens soon.” A coming-soon course that will need no registration says “Coming soon.” instead. (Sample settings.)</figcaption></figure>
+            <figure><div class="frame"><Image {...shot('closing-closed')} alt="Closing band for a course whose registration has closed: Interested in a future offering?, with Join the Interest List and View Current Programs." sizes="(min-width: 1000px) 912px, calc(100vw - 32px)" /></div><figcaption class="sample"><b>Registration closed or completed:</b> “Interested in a future offering?”, with Join the Interest List and a link to current programs. (Teen Sundays, whose registration has closed.)</figcaption></figure>
+          </div>
+        </div>
+  
+        <div class="phone-row">
+          <div class="phone"><Image {...shot('phone')} alt="The Race to Jannah page on a phone: everything in one column, in the same order." sizes="240px" /></div>
+          <div>
+            <h3>On a phone</h3>
+            <p>Everything stacks into one column in the same order. Nothing extra is needed for phones, and the review report includes phone screenshots of every changed page.</p>
+          </div>
+        </div>
+      </section>
+  
+      <!-- Dates -->
+      <section class="part" id="dates">
+        <p class="eyebrow">The schedule</p>
+        <h2>Dates and times</h2>
+        <div class="divider"><span></span></div>
+        <p>Tell your agent the dates the way you would tell a person. The site then writes them the same way on the card, the page, and the lists, works out how many sessions there are, and keeps them ready for a calendar later. Times are always Central time; the site adds “CT”.</p>
+        <p class="muted">Each example shows what you might say and what the card then shows. Examples marked “Example” are made up; the others are real courses.</p>
+        <div class="examples">
+          <div class="ex"><span class="who">Investing workshop · one session</span><blockquote>Saturday, October 24, 3 to 5 pm.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>Saturday, Oct 24</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>3:00–5:00 PM CT</span></div></div>
+          <div class="ex"><span class="who">Mommy Burnout · a weekly course</span><blockquote>Seven Mondays from September 14, 12 to 1:30.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>Sept 14 – Oct 26 · 7 sessions</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Mondays · 12:00–1:30 PM CT</span></div></div>
+          <div class="ex"><span class="who">Example · two days a week</span><blockquote>Tuesdays and Thursdays from January 12, eight sessions, 7 to 8 pm.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>Jan 12 – Feb 4 · 8 sessions</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Tuesdays &amp; Thursdays · 7:00–8:00 PM CT</span></div></div>
+          <div class="ex"><span class="who">Teen Sundays · every other week</span><blockquote>Every other Sunday from September 13, four times, 2:15 to 4:15.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>Sept 13, Sept 27, Oct 11 &amp; Oct 25</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Every other Sunday · 2:15–4:15 PM CT</span></div></div>
+          <div class="ex"><span class="who">Race to Jannah · two Sundays</span><blockquote>Sundays, November 1 and 8, 2:30 to 4:30.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>Nov 1 &amp; Nov 8</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Sundays · 2:30–4:30 PM CT</span></div></div>
+          <div class="ex"><span class="who">Example · a weekend</span><blockquote>Saturday October 31 and Sunday November 1, 2:30 to 4:30.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>Oct 31 – Nov 1 · 2 days</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Sat &amp; Sun · 2:30–4:30 PM CT</span></div></div>
+          <div class="ex"><span class="who">Monthly Qur’an Room · monthly, no end</span><blockquote>The last Wednesday of every month, starting March 25, 10 to 10:30 am.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>From March 25, 2026</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Last Wednesday of each month · 10:00–10:30 AM CT</span></div></div>
+          <div class="ex"><span class="who">Anchored Hearts · a new date each month</span><blockquote>This month’s gathering is Friday, October 16, 5:30 to 7:45. It meets monthly.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>Friday, Oct 16</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Monthly · 5:30–7:45 PM CT</span></div></div>
+          <div class="ex"><span class="who">Example · a week off</span><blockquote>Thursdays from November 5 to December 10, 10 am to 1 pm, but not on Thanksgiving, November 26.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>Nov 5 – Dec 10 · 5 sessions</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Thursdays · 10:00 AM–1:00 PM CT</span></div></div>
+          <div class="ex"><span class="who">Example · two blocks of days</span><blockquote>Monday to Thursday, June 14 to 17, then again June 28 to July 1, 10 am to 1 pm.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>June 14 – July 1 · 8 sessions</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>June 14–17: Mon–Thu · 10:00 AM–1:00 PM CT</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>June 28 – July 1: Mon–Thu · 10:00 AM–1:00 PM CT</span></div></div>
+          <div class="ex"><span class="who">Camp Futuwwah 2026 · two places</span><blockquote>July 25 to 28 at Maryam Islamic Center, then July 29 to August 1 at Masjid Al-Aqsa, 4:45 to 7:45 each day.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>July 25 – Aug 1</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>July 25–28: Sat–Tue · 4:45–7:45 PM CT</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>July 29 – Aug 1: Wed–Sat · 4:45–7:45 PM CT</span></div><p class="muted" style="margin:0;font-size:14.5px">The course page names each place on its line, with a map link for each.</p></div>
+          <div class="ex"><span class="who">Example · an overnight trip</span><blockquote>A camping trip from Friday March 12 to Sunday March 14, overnight.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>March 12–14 · 3 days</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Overnight · Fri–Sun</span></div><p class="muted" style="margin:0;font-size:14.5px">With times (“leaving Friday at 4 pm, back Sunday at 2 pm”), the line reads “Fri 4:00 PM – Sun 2:00 PM CT”.</p></div>
+          <div class="ex"><span class="who">Example · nights of Ramadan</span><blockquote>Ten nights from March 1: reflections at 11:45 pm, then games at 2 am.</blockquote><div class="lines"><span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>March 1–11</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Nightly reflections: Daily · 11:45 PM CT</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Games: Daily · 2:00 AM CT</span></div><p class="muted" style="margin:0;font-size:14.5px">An activity after midnight falls on the next calendar day, so the dates end a day after the last night.</p></div>
+        </div>
+        <div class="split">
+          <div class="panel">
+            <h3>Also possible</h3>
+            <ul>
+              <li><b>No set time</b>, such as an all-day event: the time is simply left off.</li>
+              <li><b>A time set by prayer</b> (“after Isha”, “at Tahajjud”): give it as words, without a clock time.</li>
+              <li><b>A session moves</b> to another day: the old date is skipped and the new one added.</li>
+              <li><b>Dates not decided yet</b>: give the year, and the card says “Starts 2027”.</li>
+              <li><b>Your own wording</b> for one part, such as “Girls 14+” or “Book club”, shown before its days and time.</li>
+            </ul>
+          </div>
+          <div class="panel fixed">
+            <h3>Written by the site</h3>
+            <ul>
+              <li>The style of dates and times (“Sept 14 – Oct 26”, “12:00–1:30 PM CT”).</li>
+              <li>The count of sessions or days, or the dates themselves for up to four sessions.</li>
+              <li>“Mondays”, “Every other Sunday”, “Last Wednesday of each month”.</li>
+            </ul>
+            <p class="muted" style="font-size:15px;margin:12px 0 0">These are the same on every course, so visitors always know where to look.</p>
+          </div>
+        </div>
+        <div class="word-line">Your agent’s words: <span class="word">schedule</span> for the dates and times, <span class="word">date</span> when only the year is known.</div>
+      </section>
+  
+      <!-- Fees -->
+      <section class="part" id="fees">
+        <p class="eyebrow">Fee</p>
+        <h2>Prices and financial aid</h2>
+        <div class="divider"><span></span></div>
+        <p>The fee is written the way you want people to read it. It can be one line or several, each shown on its own line.</p>
+        <div class="examples">
+          <div class="ex"><span class="who">One price</span><blockquote>The fee is $150.</blockquote><div class="lines"><span><span class="cap">Fee</span></span><span>$150</span></div></div>
+          <div class="ex"><span class="who">Quran Immersion · two prices</span><blockquote>$50 in person, $75 online.</blockquote><div class="lines"><span><span class="cap">Fee</span></span><span>$50 in person</span><span>$75 online</span></div></div>
+          <div class="ex"><span class="who">Race to Jannah · early bird</span><blockquote>$30 early bird through October 20, then $35. Highlight it at the top.</blockquote><div class="lines"><span><span class="cap">Fee</span></span><span>$30 early bird, through Oct 20</span><span>$35 from Oct 21</span><span><span class="cap" style="margin-top:6px">Highlight line</span></span><span style="color:var(--raspberry);font-weight:600">Register by October 20 and save $5.</span></div></div>
+          <div class="ex"><span class="who">Example · monthly fee</span><blockquote>$10 a month.</blockquote><div class="lines"><span><span class="cap">Fee</span></span><span>$10 a month</span></div></div>
+        </div>
+        <div class="rule">
+          <div class="tag">Early-bird prices</div>
+          Write the date into the price, as above, so the line stays true after the date passes. Ask your agent to remove the early-bird line and the highlight once the date has passed; the site does not remove them by itself.
+        </div>
+        <div class="rule">
+          <div class="tag">Financial aid</div>
+          “Need help with the fee? Financial aid” appears under the fee while people can join. For a free course, ask your agent to turn it off.
+          <div class="word-line">Your agent’s words: <span class="word">fee</span>, <span class="word">highlight</span>, <span class="word">financialAid: false</span></div>
+        </div>
+        <div class="rule">
+          <div class="tag">Zeffy prices</div>
+          Ticket prices are set on zeffy.com, not by your agent. When a price changes, change it in both places so the page and the form agree.
+        </div>
+      </section>
+  
+      <!-- Registration -->
+      <section class="part" id="registration">
+        <p class="eyebrow">Joining</p>
+        <h2>Registration</h2>
+        <div class="divider"><span></span></div>
+        <p>Each course has one way to register. It decides what the Register buttons do.</p>
+        <div class="choices">
+          <div class="choice"><h3>A Zeffy form</h3><p>For most courses, free or paid. Register opens the form in a window on the page, so people never leave the site. A free course uses a $0 ticket. Give your agent the form’s link.</p></div>
+          <div class="choice"><h3>Another site’s form</h3><p>For example a partner organisation’s Google Form. Register opens it in a new tab. Give your agent the full link.</p></div>
+          <div class="choice"><h3>No registration needed</h3><p>For a course anyone can just come to. The label says “No registration needed”, there is no Register button, and Ask a Question becomes the main button.</p></div>
+          <div class="choice"><h3>Form not ready yet</h3><p>Say so, and Register opens a short message instead of a form. Send the link when it exists.</p></div>
+        </div>
+        <figure class="shot">
+          <div class="frame" style="max-width:560px"><Image {...shot('wip')} alt="The window Register opens while a course's form is not ready: The registration form is a work in progress. Please check back soon." sizes="(min-width: 600px) 560px, calc(100vw - 32px)" /></div>
+          <figcaption>What Register opens while the form is not ready. (Sample settings.)</figcaption>
+        </figure>
+        <div class="say">
+          <div class="tag"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Tell your agent</div>
+          <ul>
+            <li>Registration for [course name] is this Zeffy form: [link].</li>
+            <li>[Course name] needs no registration; anyone can come.</li>
+          </ul>
+        </div>
+      </section>
+  
+      <!-- Place -->
+      <section class="part" id="place">
+        <p class="eyebrow">Location</p>
+        <h2>Where it meets</h2>
+        <div class="divider"><span></span></div>
+        <p>Two things decide how the location shows:</p>
+        <div class="split">
+          <div class="panel"><h3>The place</h3><ul><li>Chosen from the site’s list of places (Masjid Istiqlal, Maryam Islamic Center, and others).</li><li>A place with an address gets a map link with a pin.</li><li>A new place needs its name, and its address if you want a map link, given once.</li></ul></div>
+          <div class="panel"><h3>How it’s worded</h3><ul><li>Your words: “Sabeel Classroom at Masjid Istiqlal or online via Zoom”, “Online via Zoom”.</li><li>Leave it out and the page shows the place’s name.</li><li>Two places in one course? Give each part of the schedule its place (see <a href="#dates">Dates and times</a>).</li></ul></div>
+        </div>
+        <p style="margin-top:20px">Separately, every current course is <b>Online</b>, <b>On-site</b>, or <b>Online &amp; on-site</b>. That decides its group on Programs and the icon on its card.</p>
+      </section>
+  
+      <!-- Pictures -->
+      <section class="part" id="pictures">
+        <p class="eyebrow">Images</p>
+        <h2>Pictures</h2>
+        <div class="divider"><span></span></div>
+        <p>A course has up to two images, each in one fixed shape, so the site shows them as they are. Designers can make both from the same artwork.</p>
+        <div class="shapes">
+          <div class="shape"><div class="box wide">Course picture<br>wide · 1920 × 1080</div></div>
+          <div class="shape"><div class="box tall">Flyer<br>letter size<br>2550 × 3300</div></div>
+        </div>
+        <div class="table-wrap">
+          <table class="words">
+            <thead><tr><th></th><th>Course picture</th><th>Flyer</th></tr></thead>
+            <tbody>
+              <tr><td><b>Size</b></td><td>1920 × 1080 px</td><td>2550 × 3300 px</td></tr>
+              <tr><td><b>Shape</b></td><td>Wide (16:9). The website refuses any other shape</td><td>US Letter, portrait: 8.5 × 11 in at 300 dpi</td></tr>
+              <tr><td><b>Where it shows</b></td><td>On the card, at the top of the course page, and in link previews, which trim a thin strip from its top and bottom</td><td>Whole, lower on the course page and in Past Programs, and larger when someone clicks it</td></tr>
+              <tr><td><b>What’s on it</b></td><td>A photo or artwork in the course’s theme, such as a wide version of the flyer’s artwork, not the flyer itself. At most a large title: dates, times, and fees are on the page, and they change</td><td>The full flyer</td></tr>
+              <tr><td><b>Margins</b></td><td>Keep anything important at least 5% in from each edge</td><td>Keep text and the QR code at least 5% in from each edge</td></tr>
+              <tr><td><b>Description</b></td><td>One line saying what it shows, for people who can’t see it, such as “Title artwork: Mommy Burnout, a course on mental and spiritual health”</td><td>Not needed: the website labels it as the course’s flyer</td></tr>
+              <tr><td><b>File</b></td><td>PNG or a high-quality JPG; your agent converts it</td><td>PNG or a high-quality JPG; your agent converts it</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel" style="margin-top:20px">
+          <ul style="margin:0">
+            <li>Any wide (16:9) preset works for the course picture, such as Canva’s “Presentation (16:9)”.</li>
+            <li>No course picture yet? Your agent can make one from the flyer’s title area (its logo, title, and subtitle) until there is one. Without either, the card has no picture and the page shows a pattern in its place.</li>
+            <li>Square (1080 × 1080) and 4:5 (1080 × 1350) flyers for Instagram and WhatsApp are not used by the website.</li>
+            <li>Teacher profiles on the website are text only, so no instructor photos are needed.</li>
+            <li>Designing the flyer itself? The <a href="https://github.com/Sabeel-Institute/brand/blob/main/skills/sabeel-flyers/SKILL.md">Sabeel flyers guide</a> covers what every flyer must say, readable type, and QR codes.</li>
+          </ul>
+        </div>
+      </section>
+  
+      <!-- Text -->
+      <section class="part" id="text">
+        <p class="eyebrow">Formatting</p>
+        <h2>What kind of text each part takes</h2>
+        <div class="divider"><span></span></div>
+        <p>Some parts hold a single line, and some can hold lists and paragraphs. Describe the formatting in plain words (“make this a bulleted list”, “bold the names”), and your agent writes it.</p>
+        <div class="table-wrap">
+          <table class="words">
+            <thead><tr><th>Part</th><th>What it can hold</th><th>For example</th></tr></thead>
+            <tbody>
+              <tr><td>Title, subtitle, summary, highlight line</td><td>One line of plain text</td><td>Register by October 20 and save $5.</td></tr>
+              <tr><td>Who it’s for, location, fee, registration deadline</td><td>One line, or several lines shown one under another. No bold or links</td><td>$50 in person<br>$75 online</td></tr>
+              <tr><td>Your own card lines (only before a course has dates)</td><td>One or two short lines</td><td>2 years · Starts 2027</td></tr>
+              <tr><td>What students will learn</td><td>A list of short points, plain text</td><td>Navigate stress with greater calm and resilience</td></tr>
+              <tr><td>Instructor (guest speakers)</td><td>A name, a role, and up to three short lines. Team members’ details come from their own profiles</td><td>Sr. Heba · Guest speaker</td></tr>
+              <tr><td>What to expect, Policies</td><td>Paragraphs, bullet points, numbered lists, bold, italics, and links. No headings</td><td>See the card above</td></tr>
+              <tr><td>Program details (the longer write-up)</td><td>All of the above, plus headings at two levels. As long as you like</td><td>A session-by-session list</td></tr>
+              <tr><td>Dates, days, and times</td><td>Written by the site from the dates you give. One part of a schedule can have a short label</td><td>Girls 14+</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+  
+      <!-- Everyday -->
+      <section class="part" id="everyday">
+        <p class="eyebrow">Recipes</p>
+        <h2>Everyday requests</h2>
+        <div class="divider"><span></span></div>
+        <p>Each line is something you can say to your agent, more or less word for word.</p>
+        <div class="tasks">
+          <div class="task"><h3>Add a new course</h3><p><q>Add a new course from this flyer.</q> Give the agent what you have, using the <a href="#checklist">new course checklist</a>. Anything optional you leave out is simply left off the page.</p></div>
+          <div class="task"><h3>Next month’s gathering</h3><p><q>Update Anchored Hearts for next month: [date], [time], speaker [name]. Here is the new flyer.</q></p></div>
+          <div class="task"><h3>Open, close, or end</h3><p><q>Open registration for [course name].</q> · <q>Close registration for [course name].</q> · <q>[Course name] has ended; move it to past programs.</q> A gathering that repeats with no end also needs its last date when it ends.</p></div>
+          <div class="task"><h3>Early-bird price</h3><p><q>Add an early bird: $30 through October 20, then $35, and highlight it.</q> Later: <q>The early bird has ended; remove it.</q></p></div>
+          <div class="task"><h3>Cancel or move a session</h3><p><q>There is no class on [date].</q> · <q>The [date] session moves to [new date], same time.</q></p></div>
+          <div class="task"><h3>Change the place</h3><p><q>[Course name] now meets in [room] at [place].</q> A new place needs its address once, for the map link.</p></div>
+          <div class="task"><h3>Hide a course for now</h3><p><q>Keep [course name] off the site until we announce it.</q> Everything stays saved; nothing shows.</p></div>
+          <div class="task"><h3>The home page</h3><p><q>Always show [course name] on the home page.</q> · <q>Keep [course name] off the home page.</q> · <q>Show [course name] first among the courses that always show.</q> See <a href="#home">The home page</a>.</p></div>
+          <div class="task"><h3>A Youth &amp; Children series</h3><p>When a Summer Garden or Camp Futuwwah ends: <q>Add this year’s Camp Futuwwah to its series on the Youth &amp; Children page.</q> This changes the page itself, so it is a structural change (see <a href="#check">Checking a change</a>).</p></div>
+          <div class="task"><h3>Add a past course</h3><p><q>Add this old flyer to Past Programs.</q> The agent takes the dates from the flyer. If the flyer shows no year and no weekday, the page shows only the year.</p></div>
+        </div>
+      </section>
+  
+      <!-- Checklist -->
+      <section class="part" id="checklist">
+        <p class="eyebrow">Before you ask</p>
+        <h2>New course checklist</h2>
+        <div class="divider"><span></span></div>
+        <p>What to gather for a new course, before asking your agent to add it. Details marked <span class="need">Needed</span> must be there for the course to go on the site; the rest are optional, and the page leaves out any part you don’t give.</p>
+        <div class="table-wrap">
+          <table class="words">
+            <thead><tr><th>Detail</th><th></th><th>What to give</th></tr></thead>
+            <tbody>
+              <tr><td>Stage</td><td><span class="need">Needed</span></td><td>Coming soon, Registration open, or Ongoing series (see <a href="#stages">Stages</a>).</td></tr>
+              <tr><td>Title</td><td><span class="need">Needed</span></td><td>Exactly as on the flyer.</td></tr>
+              <tr><td>Program area</td><td><span class="need">Needed</span></td><td>Women’s Learning, Youth &amp; Children, or Hikam Foundations.</td></tr>
+              <tr><td>Summary</td><td><span class="need">Needed</span></td><td>One sentence on what students will learn and why it matters. It shows under the title and in link previews.</td></tr>
+              <tr><td>Dates and times</td><td><span class="need">Needed</span></td><td>In plain words, with anything skipped or moved (see <a href="#dates">Dates and times</a>). If they aren’t set yet, the year it starts.</td></tr>
+              <tr><td>Online, On-site, or Online &amp; on-site</td><td><span class="need">Needed</span> once registration opens</td><td>Decides its group on Programs.</td></tr>
+              <tr><td>Subtitle</td><td><span class="opt" style="margin:0">Optional</span></td><td>A tagline under the title.</td></tr>
+              <tr><td>Who it’s for</td><td><span class="opt" style="margin:0">Optional</span></td><td>“Adult women”, “Boys 12–16 · Girls 13+”.</td></tr>
+              <tr><td>Place</td><td><span class="opt" style="margin:0">Optional</span></td><td>The place’s name, and its street address if the site doesn’t know it yet, for the map link.</td></tr>
+              <tr><td>How the location should read</td><td><span class="opt" style="margin:0">Optional</span></td><td>“Sabeel Classroom at Masjid Istiqlal or online via Zoom”.</td></tr>
+              <tr><td>Fee</td><td><span class="opt" style="margin:0">Optional</span></td><td>One line per price, as charged; early-bird prices with their last date. Say if the course is free.</td></tr>
+              <tr><td>Registration</td><td><span class="opt" style="margin:0">Optional</span></td><td>A Zeffy form link, another organisation’s form link, “no registration needed”, or “not ready yet” (see <a href="#registration">Registration</a>).</td></tr>
+              <tr><td>Registration deadline</td><td><span class="opt" style="margin:0">Optional</span></td><td>As people should read it.</td></tr>
+              <tr><td>Highlight line</td><td><span class="opt" style="margin:0">Optional</span></td><td>One short line for the top of the page.</td></tr>
+              <tr><td>What students will learn</td><td><span class="opt" style="margin:0">Optional</span></td><td>Three to five short points.</td></tr>
+              <tr><td>Instructors</td><td><span class="opt" style="margin:0">Optional</span></td><td>Teachers on the Teachers &amp; Team page, by name. For a guest: name, role, and up to three short lines. For a new teacher joining Teachers &amp; Team: name and title (Ustadhah, Ust., Sr., Br., or Dr.), role, up to three short lines of studies and degrees, and a longer bio.</td></tr>
+              <tr><td>What to expect</td><td><span class="opt" style="margin:0">Optional</span></td><td>How it runs, the activities, and anything to bring or know first.</td></tr>
+              <tr><td>Policies</td><td><span class="opt" style="margin:0">Optional</span></td><td>Attendance, refunds, recording, safeguarding.</td></tr>
+              <tr><td>Longer write-up</td><td><span class="opt" style="margin:0">Optional</span></td><td>Anything else for the page, such as a session-by-session list.</td></tr>
+              <tr><td>Flyer and course picture</td><td><span class="opt" style="margin:0">Optional</span></td><td>See <a href="#pictures">Pictures</a>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+  
+        <div class="sub">
+          <h3>Fill-in template</h3>
+          <p>Copy this into an email or message, fill it in, and attach the flyer and the course picture.</p>
+          <div class="copybox">
+            <div class="copybar"><button type="button" id="copy-template">Copy template</button><p id="copy-status" aria-live="polite"></p></div>
+  <pre class="template" id="template" tabindex="0" aria-label="Template to copy">New course for the Sabeel website
+  
+  Stage (Coming soon, Registration open, or Ongoing series):
+  
+  ABOUT THE COURSE
+  Title:
+  Subtitle (optional):
+  Summary (one sentence):
+  Program area (Women’s Learning, Youth &amp; Children, or Hikam Foundations):
+  Who it’s for (optional):
+  
+  WHEN
+  Dates and times, in plain words (for example: seven Mondays from
+  September 14, 12 to 1:30 pm), or the year if not set yet:
+  Anything skipped or moved (optional):
+  
+  WHERE
+  Online, On-site, or Online &amp; on-site:
+  Place (name, and street address if it’s new):
+  How the location should read (optional):
+  
+  FEE AND REGISTRATION
+  Fee (one line per price; early-bird prices with their last date; or Free):
+  Registration (Zeffy form link, another organisation’s form link,
+  no registration needed, or not ready yet):
+  Registration deadline (optional):
+  Highlight line for the top of the page (optional):
+  
+  ON THE COURSE PAGE (all optional)
+  What students will learn (three to five points):
+  Instructors:
+  What to expect:
+  Policies:
+  Longer write-up:
+  
+  IMAGES (attach both)
+  Flyer: US Letter portrait, 2550 × 3300 px, PNG or JPG
+  Course picture: 16:9, 1920 × 1080 px, PNG or JPG
+  Course picture description (one line):</pre>
+          </div>
+        </div>
+  
+        <div class="sub">
+          <h3>Photos and videos</h3>
+          <p>Once a course has run, the website can show photos and videos from it.</p>
+          <div class="panel">
+            <ul style="margin:0">
+              <li>Send only photos and videos Sabeel approves for the website.</li>
+              <li>Faces are blurred or turned away, unless the people shown have agreed to show them. For children, their families agree.</li>
+              <li>Children’s names are never shared without separate permission.</li>
+              <li>A photo at the top of a page or section is landscape, with the subject near the centre, at least 1600 × 1200 px. Photos in the home page’s row can be landscape or portrait.</li>
+              <li>Videos are landscape (16:9) or portrait (9:16), with permission from the people in them and from the parents of children.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+  
+      <!-- Fixed -->
+      <section class="part" id="fixed">
+        <p class="eyebrow">Know the limits</p>
+        <h2>What stays the same on every course</h2>
+        <div class="divider"><span></span></div>
+        <p>Some things are part of the template, so every course looks and works the same. Changing one of them changes every course at once: that is a design change for the website’s administrator, not a request for one course.</p>
+        <div class="split">
+          <div class="panel">
+            <h3>You decide, course by course</h3>
+            <ul>
+              <li>All the words: title, subtitle, summary, audience, location, fee, deadline, highlight, what students will learn, what to expect, policies, and the longer write-up.</li>
+              <li>The dates and times, and any parts or skipped dates.</li>
+              <li>The stage, and how people register.</li>
+              <li>The picture, the flyer, and the instructors.</li>
+              <li>Which optional parts appear: leave one out and it’s hidden.</li>
+              <li>Your own card lines, while a course has only its year.</li>
+            </ul>
+          </div>
+          <div class="panel fixed">
+            <h3><svg class="ic" aria-hidden="true" style="width:18px;height:18px;margin-right:6px;vertical-align:-2px"><use href="#i-lock"/></svg>The template decides</h3>
+            <ul>
+              <li>The order of the parts on the page and on the card.</li>
+              <li>No emoji: they look different on every phone and computer.</li>
+              <li>Colours, fonts, sizes, and icons.</li>
+              <li>Headings such as “What students will learn” and “Ready to join?”.</li>
+              <li>Button words: Register, Ask a Question, View Details, Join the Interest List.</li>
+              <li>How dates, times, and counts are written.</li>
+              <li>The order of courses in lists: open first, then newest start.</li>
+              <li>That a stage changes only when someone changes it.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule">
+          <div class="tag">Special pages</div>
+          A flagship course can have its own hand-designed page instead of the standard one, as Hikam Foundations does. Its card and listings still work the usual way. Ask the administrator before planning one.
+        </div>
+      </section>
+  
+      <!-- Check -->
+      <section class="part" id="check">
+        <p class="eyebrow">Before it goes live</p>
+        <h2>Checking a change</h2>
+        <div class="divider"><span></span></div>
+        <p>Your agent sends each change for review (on GitHub this is a “pull request”). A few minutes later a comment appears on it with two links:</p>
+        <div class="split">
+          <div class="panel"><h3>Preview</h3><ul><li>The whole website with your change in it.</li><li>Open the course page, its card on Programs, and the home page.</li><li>Look at it on your phone too.</li></ul></div>
+          <div class="panel"><h3>Visual changes</h3><ul><li>Before-and-after pictures of every page that looks different.</li><li>Check that only the pages you expected changed.</li></ul></div>
+        </div>
+        <div class="rule">
+          <div class="tag">What the page says</div>
+          Your agent also lists, in the pull request, what the course page says: its stage, dates, days and times, place, fee, and where Register leads. Check each line against the flyer before you publish.
+        </div>
+        <p style="margin-top:20px">When it looks right, publish it: at the bottom of the pull request, press the green merge button, then confirm. The live site shows the change a few minutes later; until then, nothing on it changes.</p>
+        <div class="split">
+          <div class="panel"><h3>Routine changes: you publish</h3><ul><li>Courses, teachers, testimonials, places, the photos on the home page, and the photos on other pages.</li><li>That is what most requests change.</li></ul></div>
+          <div class="panel fixed"><h3><svg class="ic" aria-hidden="true" style="width:18px;height:18px;margin-right:6px;vertical-align:-2px"><use href="#i-lock"/></svg>Structural changes: the administrator publishes</h3><ul><li>Anything else, such as the template, the menus, contact details, an old address that should lead somewhere, or a new edition in a Youth &amp; Children series.</li><li>Your agent tells you when a request needs one, and keeps it in its own review, so your routine changes can go live without waiting.</li><li>GitHub labels it “structural” and asks the administrator to review it.</li></ul></div>
+        </div>
+        <div class="rule">
+          <div class="tag">When the merge button is grey</div>
+          GitHub is still checking the change: wait a few minutes. If the <b>build</b> check fails, ask your agent to fix it. A structural change fails the <b>change scope</b> check on purpose: only the administrator can publish it.
+        </div>
+      </section>
+  
+      <!-- Words -->
+      <section class="part" id="words">
+        <p class="eyebrow">Optional</p>
+        <h2>Your agent’s words</h2>
+        <div class="divider"><span></span></div>
+        <p>Plain words are enough. If you want to be exact, or to check the agent’s work, these are the names it uses.</p>
+        <div class="table-wrap">
+          <table class="words">
+            <thead><tr><th>On the page</th><th>Agent’s word</th></tr></thead>
+            <tbody>
+              <tr><td>Stage (Coming soon, Registration open…)</td><td><span class="word">status</span></td></tr>
+              <tr><td>Title, subtitle, summary</td><td><span class="word">title</span> <span class="word">subtitle</span> <span class="word">summary</span></td></tr>
+              <tr><td>Area (Women’s Learning, Youth &amp; Children, Hikam Foundations)</td><td><span class="word">area</span></td></tr>
+              <tr><td>Who it’s for</td><td><span class="word">audience</span></td></tr>
+              <tr><td>Dates and times</td><td><span class="word">schedule</span>, or <span class="word">date</span> when only the year is known</td></tr>
+              <tr><td>Online, On-site, Online &amp; on-site</td><td><span class="word">format</span></td></tr>
+              <tr><td>Place, and how it’s worded</td><td><span class="word">venue</span> <span class="word">location</span></td></tr>
+              <tr><td>Fee, financial aid link</td><td><span class="word">fee</span> <span class="word">financialAid</span></td></tr>
+              <tr><td>How people register</td><td><span class="word">registration</span></td></tr>
+              <tr><td>Registration deadline</td><td><span class="word">deadline</span></td></tr>
+              <tr><td>Highlight line</td><td><span class="word">highlight</span></td></tr>
+              <tr><td>Your own card lines</td><td><span class="word">card</span></td></tr>
+              <tr><td>What students will learn</td><td><span class="word">outcomes</span></td></tr>
+              <tr><td>Instructors, What to expect, Policies</td><td><span class="word">instructors</span> <span class="word">expect</span> <span class="word">policies</span></td></tr>
+              <tr><td>Longer write-up (Program details)</td><td>the course’s body text</td></tr>
+              <tr><td>Course picture, flyer</td><td><span class="word">image</span> <span class="word">flyer</span></td></tr>
+              <tr><td>Always or never on the home page</td><td><span class="word">home</span></td></tr>
+              <tr><td>Order of the courses that always show</td><td><span class="word">homePriority</span></td></tr>
+              <tr><td>Hidden for now</td><td><span class="word">draft</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <footer>The pictures in this guide are screenshots of the website’s own pages. The full rules your agent follows are in the website’s instruction file, AGENTS.md.</footer>
+      </section>
+    </main>
+  </div>
+
+    <script>
+      const button = document.getElementById('copy-template')!;
+      const template = document.getElementById('template')!;
+      const status = document.getElementById('copy-status')!;
+      /** Without clipboard access, the text is selected for the reader to copy. */
+      function selectTemplate() {
+        const range = document.createRange();
+        range.selectNodeContents(template);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        status.textContent = 'Selected. Press Ctrl+C, or ⌘C on a Mac, to copy.';
+      }
+      button.addEventListener('click', () => {
+        const copying = navigator.clipboard?.writeText(template.textContent ?? '');
+        if (!copying) return selectTemplate();
+        copying.then(() => (status.textContent = 'Copied. Paste it into an email or message.'), selectTemplate);
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  /* A reading column beside a sticky contents list; annotated screenshots
+     sit in framed figures with numbered legends. The colours and fonts are
+     the site's tokens (src/styles/global.css), under short local names. One
+     light look, as the brand requires. */
+  :root {
+    --canvas: var(--color-canvas);
+    --surface: var(--color-surface);
+    --inset: var(--color-inset);
+    --sage-mist: var(--color-sage-mist);
+    --sage: var(--color-sage);
+    --ink: var(--color-ink);
+    --ink-soft: var(--color-ink-soft);
+    --raspberry: var(--color-raspberry);
+    --raspberry-deep: var(--color-raspberry-deep);
+    --on-raspberry: var(--color-on-raspberry);
+    --gold: var(--color-gold);
+    --gold-text: var(--color-gold-text);
+    --border: var(--color-border);
+    --display: var(--font-display);
+    --body: var(--font-sans);
+    --label: var(--font-label);
+    --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--ink);
+    font: 400 16.5px/1.65 var(--body);
+    padding-inline: 16px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-block: 40px 96px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .wrap > * { min-width: 0; }
+  @media (min-width: 1000px) { .wrap { grid-template-columns: 220px minmax(0, 1fr); } }
+
+  /* Contents */
+  nav.toc { font: 500 14px/1.4 var(--label); }
+  nav.toc p { margin: 0 0 10px; color: var(--gold-text); letter-spacing: .08em; text-transform: uppercase; font-weight: 700; font-size: 12.5px; }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+  nav.toc a { display: block; white-space: nowrap; color: var(--ink-soft); text-decoration: none; padding: 7px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); }
+  nav.toc a:hover, nav.toc a:focus-visible { color: var(--raspberry); border-color: var(--gold); }
+  @media (min-width: 1000px) {
+    nav.toc { position: sticky; top: 24px; align-self: start; }
+    nav.toc ol { flex-direction: column; gap: 2px; overflow: visible; }
+    nav.toc a { border: 0; background: none; padding: 6px 0 6px 12px; border-left: 2px solid var(--border); border-radius: 0; white-space: normal; }
+    nav.toc a:hover, nav.toc a:focus-visible { border-left-color: var(--raspberry); }
+  }
+  a { color: var(--raspberry); text-decoration-color: var(--gold); text-underline-offset: 3px; }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+  main { min-width: 0; }
+  header.intro { border-bottom: 1px solid var(--border); padding-bottom: 36px; margin-bottom: 8px; }
+  .eyebrow { font: 700 13px/1.3 var(--label); letter-spacing: .09em; text-transform: uppercase; color: var(--gold-text); margin: 0; }
+  h1, h2, h3 { font-family: var(--display); color: var(--raspberry); text-wrap: balance; font-weight: 700; line-height: 1.1; }
+  h1 { font-size: clamp(2.4rem, 5vw, 3.6rem); margin: 10px 0 0; }
+  h2 { font-size: clamp(1.9rem, 3.4vw, 2.5rem); margin: 0; }
+  h3 { font-size: 1.55rem; margin: 0; }
+  .divider { display: flex; align-items: center; width: 150px; margin: 14px 0 0; }
+  .divider::before, .divider::after { content: ''; height: 1px; flex: 1; background: var(--gold); }
+  .divider span { width: 9px; height: 9px; background: var(--gold); transform: rotate(45deg); margin: 0 4px; }
+  .lead { font-size: 1.15rem; color: var(--ink-soft); max-width: 44rem; margin: 20px 0 0; }
+  p, li { max-width: 44rem; }
+  section.part { padding-block: 56px 8px; border-top: 1px solid var(--border); scroll-margin-top: 16px; }
+  section.part:first-of-type { border-top: 0; }
+  .sub { margin-top: 40px; }
+  .muted { color: var(--ink-soft); }
+
+  /* Flow diagram */
+  .flow { margin-top: 32px; display: grid; gap: 14px; align-items: center; }
+  @media (min-width: 760px) { .flow { grid-template-columns: auto auto minmax(0, 1fr); } }
+  .node { background: var(--surface); border: 1px solid var(--gold); border-radius: var(--radius); padding: 14px 16px; font-weight: 600; }
+  .node small { display: block; font-weight: 400; color: var(--ink-soft); font-size: 14px; margin-top: 2px; }
+  .node.you { background: var(--raspberry); color: var(--on-raspberry); border-color: var(--raspberry); }
+  .node.you small { color: color-mix(in srgb, var(--on-raspberry) 82%, var(--raspberry)); }
+  .arrow { color: var(--gold-text); font: 700 22px/1 var(--label); text-align: center; }
+  @media (max-width: 759px) { .arrow { transform: rotate(90deg); } }
+  .outputs { display: grid; gap: 8px; }
+  @media (min-width: 560px) { .outputs { grid-template-columns: 1fr 1fr; } }
+  .outputs .node { font-weight: 500; }
+  .flow-steps { display: grid; gap: 14px; }
+
+  /* Callouts */
+  .say { margin: 22px 0 0; background: var(--sage-mist); border-radius: var(--radius); padding: 16px 18px 16px 18px; max-width: 44rem; }
+  .say .tag, .rule .tag { font: 700 12px/1 var(--label); letter-spacing: .09em; text-transform: uppercase; color: var(--ink); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .say ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
+  .say li::before { content: '“'; color: var(--gold-text); font-weight: 700; margin-right: 2px; }
+  .say li::after { content: '”'; color: var(--gold-text); font-weight: 700; margin-left: 1px; }
+  .rule { margin: 22px 0 0; border: 1px solid var(--border); border-left: 0; border-radius: var(--radius); padding: 16px 18px; background: var(--surface); max-width: 44rem; position: relative; }
+  .rule::before { content: ''; position: absolute; inset: 14px auto 14px 0; width: 3px; border-radius: 3px; background: var(--gold); }
+  code, .word { font: 500 13.5px/1 var(--mono); background: var(--inset); color: var(--ink); padding: 3px 6px; border-radius: 6px; white-space: nowrap; }
+  .word-line { font: 500 13px/1.4 var(--label); color: var(--ink-soft); margin-top: 10px; }
+
+  /* Figures with numbered legends */
+  figure.shot { margin: 28px 0 0; display: grid; gap: 22px; }
+  @media (min-width: 900px) { figure.shot.side { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; } }
+  figure.shot .frame { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: 0 10px 30px -18px color-mix(in srgb, var(--ink) 45%, transparent); }
+  figure.shot img { display: block; width: 100%; height: auto; }
+  figcaption { font-size: 15px; color: var(--ink-soft); }
+  ol.legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  ol.legend li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; align-items: start; }
+  .num { width: 28px; height: 28px; border-radius: 999px; background: var(--raspberry); color: var(--on-raspberry); font: 700 14px/28px var(--body); text-align: center; box-shadow: 0 0 0 2px var(--surface); }
+  ol.legend b { color: var(--ink); }
+  .auto, .opt { font: 700 11px/1 var(--label); letter-spacing: .08em; text-transform: uppercase; border-radius: 999px; padding: 3px 7px; margin-left: 6px; vertical-align: 2px; white-space: nowrap; }
+  .auto { color: var(--gold-text); border: 1px solid var(--gold); }
+  .opt { color: var(--ink); border: 1px solid var(--sage); background: var(--sage-mist); }
+  .key { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 16px; font-size: 15px; color: var(--ink-soft); }
+  .key span:first-child { margin-left: 0; }
+  .pair { display: grid; gap: 16px; margin-top: 18px; }
+  @media (min-width: 760px) { .pair { grid-template-columns: 1fr 1fr; } }
+  .pair figure { margin: 0; display: grid; gap: 10px; align-content: start; }
+  .pair .frame, .stack .frame { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .pair img, .stack img { display: block; width: 100%; height: auto; }
+  .stack { display: grid; gap: 14px; margin-top: 18px; }
+  .stack figure { margin: 0; display: grid; gap: 8px; }
+  .sample { font: 500 13px/1.4 var(--label); color: var(--ink-soft); }
+  .sample b { color: var(--ink); }
+
+  /* Stage chips */
+  .stages { display: grid; gap: 12px; margin-top: 26px; }
+  @media (min-width: 720px) { .stages { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); } }
+  .stage { background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--gold); border-radius: var(--radius); padding: 16px 18px; }
+  .stage .eyebrow { font-size: 12.5px; }
+  .stage p { margin: 8px 0 0; font-size: 15px; color: var(--ink-soft); }
+  .stage p b { color: var(--ink); font-weight: 600; }
+
+  /* Mini cards for the dates examples */
+  .examples { display: grid; gap: 14px; margin-top: 26px; }
+  @media (min-width: 720px) { .examples { grid-template-columns: 1fr 1fr; } }
+  .ex { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 12px; align-content: start; }
+  .ex .who { font: 700 12px/1 var(--label); letter-spacing: .09em; text-transform: uppercase; color: var(--gold-text); }
+  .ex blockquote { margin: 0; font-size: 15.5px; color: var(--ink); }
+  .ex blockquote::before { content: 'You say: '; font-weight: 600; color: var(--raspberry); }
+  .lines { border-top: 1px dashed var(--border); padding-top: 10px; display: grid; gap: 4px; font-size: 15px; color: var(--ink-soft); }
+  .lines span { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 9px; align-items: start; }
+  .ic { width: 16px; height: 16px; margin-top: 3px; stroke: var(--gold-text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .lines .cap { display: block; font: 700 11px/1.2 var(--label); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 2px; }
+
+  /* Two-column comparisons */
+  .split { display: grid; gap: 16px; margin-top: 26px; }
+  @media (min-width: 760px) { .split { grid-template-columns: 1fr 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+  .panel h3 { font-size: 1.35rem; }
+  .panel ul, .panel ol { margin: 12px 0 0; padding-left: 20px; display: grid; gap: 6px; font-size: 15.5px; }
+  .panel.fixed { background: var(--inset); }
+
+  /* Registration choices */
+  .choices { display: grid; gap: 14px; margin-top: 26px; }
+  @media (min-width: 720px) { .choices { grid-template-columns: 1fr 1fr; } }
+  .choice { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+  .choice h3 { font-size: 1.3rem; }
+  .choice p { margin: 8px 0 0; font-size: 15.5px; color: var(--ink-soft); }
+
+  /* Picture shapes */
+  .shapes { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-end; margin-top: 26px; }
+  .shape { display: grid; gap: 10px; justify-items: start; max-width: 100%; }
+  .shape .box { border: 2px dashed var(--gold); border-radius: 8px; background: var(--surface); display: grid; place-items: center; color: var(--gold-text); font: 700 13px/1.3 var(--label); text-align: center; padding: 8px; max-width: 100%; }
+  .shape .wide { width: 320px; aspect-ratio: 16 / 9; }
+  .shape .tall { width: 170px; aspect-ratio: 8.5 / 11; }
+  .shape p { margin: 0; font-size: 15px; color: var(--ink-soft); max-width: 22rem; }
+
+  /* Everyday requests */
+  .tasks { display: grid; gap: 12px; margin-top: 26px; }
+  .task { display: grid; gap: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+  @media (min-width: 760px) { .task { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); gap: 20px; } }
+  .task h3 { font-size: 1.25rem; }
+  .task p { margin: 0; font-size: 15.5px; color: var(--ink-soft); }
+  .task q { color: var(--ink); quotes: '“' '”'; }
+
+  /* Phone view */
+  .phone-row { display: grid; gap: 24px; margin-top: 26px; align-items: center; }
+  @media (min-width: 760px) { .phone-row { grid-template-columns: 260px minmax(0, 1fr); } }
+  .phone { width: 260px; max-width: 100%; border: 10px solid var(--ink); border-radius: 34px; overflow: hidden; background: var(--canvas); box-shadow: 0 16px 34px -18px color-mix(in srgb, var(--ink) 60%, transparent); }
+  .phone img { display: block; width: 100%; height: auto; }
+
+  /* Word list */
+  .words { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 22px; }
+  .table-wrap { overflow-x: auto; }
+  .words th, .words td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .words th { font: 700 12px/1.2 var(--label); letter-spacing: .08em; text-transform: uppercase; color: var(--gold-text); }
+  .need { font: 700 11px/1 var(--label); letter-spacing: .08em; text-transform: uppercase; color: var(--on-raspberry); background: var(--raspberry); border-radius: 999px; padding: 4px 8px; white-space: nowrap; }
+  .copybox { margin-top: 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; max-width: 44rem; }
+  .copybar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .copybar button { appearance: none; border: 0; border-radius: 999px; padding: 10px 18px; background: var(--raspberry); color: var(--on-raspberry); font: 600 15px/1 var(--body); cursor: pointer; }
+  .copybar button:hover { background: var(--raspberry-deep); }
+  .copybar p { margin: 0; font-size: 14.5px; color: var(--ink-soft); }
+  pre.template { margin: 0; padding: 16px; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 14px/1.7 var(--mono); color: var(--ink); }
+  footer { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--border); font-size: 14.5px; color: var(--ink-soft); }
+</style>
