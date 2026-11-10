@@ -18,5 +18,7 @@ how to set them up or move them. Every pull request gets a preview and a
 visual comparison with `main`, linked in a comment on the pull request.
 
 Staff who ask an agent for changes can see everything a program's page and
-card can show in the staff guide, an unlisted page of the site whose source
-is `src/pages/course-guide-yild5ztlpf.astro`.
+card can show in the staff guide:
+[oursabeel.com/course-guide-yild5ztlpf/](https://oursabeel.com/course-guide-yild5ztlpf/).
+It is unlisted, so nothing on the site links to it; its source is
+`src/pages/course-guide-yild5ztlpf.astro`.
