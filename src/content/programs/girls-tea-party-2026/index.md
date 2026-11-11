@@ -14,6 +14,8 @@ location: Sabeel Classroom at Masjid Istiqlal
 fee: $20 per person
 registration:
   zeffy: girls-tea-party
+image: ./image.webp
+imageAlt: SI Girls Tea Party artwork with tea party details and floral decorations
 flyer: ./flyer.webp
 outcomes:
   - Confidence rooted in faith
