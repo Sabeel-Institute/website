@@ -2,7 +2,7 @@
 status: open
 title: Ramadan Recharge
 subtitle: Maximizing Your Ramadan
-summary: Come away with the knowledge, inspiration, and a practical plan to make this Ramadan your most meaningful yet!
+summary: Join Sabeel Institute for a six-class journey exploring the virtues and fiqh of fasting, developing love for Allah, the power of duʿāʾ, spiritual growth, and practical ways to make the most of Ramadan.
 area: womens-learning
 schedule:
   - start: 2027-01-12
