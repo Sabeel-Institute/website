@@ -8,7 +8,6 @@ schedule:
   - start: 2027-01-12
     time: 12:30–1:30 PM
     repeat: FREQ=WEEKLY;BYDAY=TU,TH;UNTIL=20270128
-    label: Online every session; on-site Thursdays
 audience: Women
 format: Online & on-site
 venue: masjid-istiqlal
@@ -24,8 +23,6 @@ image: ./image.webp
 imageAlt: "Title artwork: Ramadan Recharge — Prepare your heart. Renew your faith. Maximize your Ramadan."
 flyer: ./flyer.webp
 ---
-
-## Ramadan Recharge 2027: Maximizing Your Ramadan
 
 Ramadan is more than a month of fasting, it is an opportunity to strengthen our relationship with Allah, purify our hearts, and transform our lives.
 
