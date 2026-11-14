@@ -24,6 +24,7 @@ const eyebrow = completed ? `${programYear(program)} · ${area}` : `${statusLabe
 const teachers = completed ? (await resolveInstructors(d.instructors)).map((i) => i.name) : [];
 const when = completed ? undefined : await programSchedule(program);
 const own = asLines(d.card);
+const cardSchedule = d.cardSchedule ? asLines(d.cardSchedule) : when?.cardLines ?? [];
 const durationSuffix = when?.length ? ` · ${when.length}` : '';
 const cardDates = d.hideCardDuration && durationSuffix && when?.cardDates.endsWith(durationSuffix)
   ? when.cardDates.slice(0, -durationSuffix.length)
@@ -34,7 +35,7 @@ const schedule: Detail[] = own.length
   ? own.map((value, i) => ({ icon: i ? 'clock' : 'calendar', label: 'Schedule', value }))
   : [
       { icon: 'calendar', label: 'Dates', value: cardDates },
-      ...(when?.cardLines ?? []).map((value): Detail => ({ icon: 'clock', label: 'Schedule', value })),
+      ...cardSchedule.map((value): Detail => ({ icon: 'clock', label: 'Schedule', value })),
     ];
 const details: Detail[] = [
   { icon: 'users', label: 'Audience', value: asLines(d.audience).join(' · ') },
