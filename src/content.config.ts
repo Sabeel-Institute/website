@@ -180,6 +180,8 @@ const programs = defineCollection({
          * shows in place of its dates ("2 years · Starts 2027").
          */
         card: z.union([text, z.array(text).min(1).max(2)]).optional(),
+        /** Replaces a card’s calculated session/day count; dates and the program page stay automatic. */
+        cardDuration: text.optional(),
         /** Three to five things students will learn. */
         outcomes: z.array(text).min(1).max(8).optional(),
         instructors: z.array(instructor).min(1).optional(),
