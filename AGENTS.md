@@ -307,6 +307,9 @@ card: 2 years · Starts 2027
 
 The build stops on `card` in a program with a schedule.
 
+Set `hideCardDuration: true` to leave the session/day count off a program's
+card while keeping its dates, times, and full schedule on its page.
+
 How dates and times are worded is the site's, the same for every program.
 When someone asks for one program's dates worded another way, keep its
 schedule as it is, tell them what the card and page show (from `npm run
@@ -400,6 +403,7 @@ optional. The build stops on a field that is not in this table, naming it.
 | `deadline` | Registration deadline text | `Register by Wednesday, October 7` |
 | `highlight` | A short line above the Register button: an early-bird price, limited seats, a new date. Shown until registration closes | `Register by October 20 and save $5.` |
 | `card` | Only without a schedule: one or two lines a card, or a Programs list, shows in place of its year; see Cards | `2 years · Starts 2027` |
+| `hideCardDuration` | `true` hides the session/day count on cards; dates, times, and the program page are unchanged | `true` |
 | `outcomes` | Three to five things students will learn (list) | |
 | `instructors` | Team file names and/or inline guests `{ name, role, highlights }` | `sameera-shah` |
 | `expect` | Teaching format, activities, participation, and anything to bring or know first; Markdown without headings (see below) | |

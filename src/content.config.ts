@@ -180,6 +180,8 @@ const programs = defineCollection({
          * shows in place of its dates ("2 years · Starts 2027").
          */
         card: z.union([text, z.array(text).min(1).max(2)]).optional(),
+        /** Hide the session/day count on cards while keeping the full schedule. */
+        hideCardDuration: z.boolean().optional(),
         /** Three to five things students will learn. */
         outcomes: z.array(text).min(1).max(8).optional(),
         instructors: z.array(instructor).min(1).optional(),
