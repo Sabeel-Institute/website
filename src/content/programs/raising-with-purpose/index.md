@@ -1,5 +1,6 @@
 ---
 status: open
+draft: true
 title: Raising with Purpose
 subtitle: A monthly support circle for homeschooling moms
 summary: A monthly circle, with the Muslim Homeschooling Community of Greater Houston, for homeschooling moms to connect and reflect on their purpose and intentions.
