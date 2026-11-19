@@ -2,7 +2,7 @@
 status: open
 title: Gather & Grow
 subtitle: A Halaqa for Moms | A Playdate for Little Ones
-summary: Join us for a halaqa on the gentleness and mercy of the Prophet ﷺ while the little ones enjoy a playdate.
+summary: Join us for a halaqa on the gentleness and mercy of the Prophet (SAW) while the little ones enjoy a playdate.
 area: womens-learning
 schedule:
   - start: 2026-12-03
