@@ -1,37 +1,40 @@
 ---
 status: open
-title: Anchored Hearts Sister’s Circle
-subtitle: Come as you are, leave with a heart a little more anchored.
-summary: A monthly gathering where sisters learn, reflect, and connect through beneficial Islamic talks, meaningful conversation, and occasional social activities.
+title: Anchored Hearts December
+subtitle: "The Distracted Heart: Reconnecting with Allah in a Digital World"
+summary: A monthly gathering to nurture faith, share meaningful conversations, and strengthen bonds of sisterhood.
 area: womens-learning
 schedule:
-  - start: 2026-11-14
-    time: 12:30–2:00 PM
+  - start: 2026-12-13
+    time: 2:15–3:30 PM
     label: Monthly
-audience: Women and youth girls
+audience: Women and girls
 format: On-site
 venue: masjid-istiqlal
 location: Sabeel Classroom at Masjid Istiqlal
-fee: Free
+fee:
+  - Free
+  - $5 suggested donation for the DIY drink
 financialAid: false
 registration:
-  zeffy: anchored-hearts-sisters-circle-november
+  zeffy: anchored-hearts-sisters-circle-december
 instructors:
-  - zona-bokhari
+  - sana-sattar
 image: ./image.webp
-imageAlt: "Title artwork: Anchored Hearts, Sister’s Circle"
+imageAlt: "Title artwork: December Anchored Hearts Sister’s Circle"
 flyer: ./flyer.webp
 ---
 
-Anchored Hearts is a monthly gathering for sisters to learn, reflect, and connect. Each gathering offers a welcoming space to nurture faith and build sisterhood.
+A conversation for women and teen girls alike!
 
-## This month: Seek ‘Ilm. Seek Jannah.
+We live in a world of endless scrolling, constant notifications, and digital distractions. But have we stopped to consider what all of this is doing to our minds, our hearts, and our connection with Allah?
 
-**A Path to Jannah in Every Season of Life, with Ust. Zona Bokhari, on Saturday, November 14.** Join us for an uplifting halaqa on how seeking knowledge keeps us grounded in faith, strengthens our connection with Allah, and guides us toward Jannah. Halaqa will be followed by fun games and sisterhood.
+Join us for a thought-provoking discussion on how smartphones and social media shape our attention, habits, and spiritual well-being.
 
-### Schedule
+Drawing on modern research and Islamic teachings, we’ll explore practical ways to reclaim our time and strengthen our connection with Allah.
 
-- **12:30–1:30 PM** – Beneficial Talk
-- **1:30–2:00 PM** – Games & Sisterhood
+## Sip & learn
 
-Whether you’re a student, a busy mom, a working professional, or in a season all your own, this space is for you!
+Complimentary chai for ladies and a fun DIY drink station for teens!
+
+Please register to help us plan and reserve your DIY drink in advance!
