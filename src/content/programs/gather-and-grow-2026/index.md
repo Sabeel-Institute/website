@@ -15,6 +15,8 @@ fee: Free
 financialAid: false
 registration:
   zeffy: gather-and-grow-5
+instructors:
+  - afsha-mohammad
 image: ./image.webp
 imageAlt: "Title artwork: Gather & Grow, A Halaqa for Moms | A Playdate for Little Ones"
 flyer: ./flyer.webp
