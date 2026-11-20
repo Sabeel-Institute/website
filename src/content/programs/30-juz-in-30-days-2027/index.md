@@ -3,6 +3,8 @@ status: open
 title: 30 Juz in 30 Days
 summary: Prepare your heart and mind for Ramadan with Sabeel’s upcoming daily Tafseer program!
 area: womens-learning
+cardDuration: 30 days of tafsir and 3 days of reflections
+cardSchedule: Online daily; on-site Tuesdays & Saturdays 12:30–1:30 PM CT
 schedule:
   - start: 2027-02-02
     time: 12:30–1:30 PM
