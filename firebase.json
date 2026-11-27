@@ -423,6 +423,15 @@
     ],
     "headers": [
       {
+        "source": "/guides/*.pdf",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=300"
+          }
+        ]
+      },
+      {
         "source": "/_astro/**",
         "headers": [
           {

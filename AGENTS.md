@@ -114,7 +114,7 @@ flowchart LR
 | `src/layouts/BaseLayout.astro` | `<head>`, header, footer, interest-list dialog |
 | `src/styles/global.css` | Design tokens and shared classes |
 | `src/assets/` | Images processed at build time (`photos/`, `images/`, `decor/`), and videos (`videos/`) |
-| `public/` | Files served as-is (favicons) |
+| `public/` | Files served as-is (favicons, and the app user guides in `guides/`) |
 | `firebase.json` | Hosting settings, and redirects for moved pages and the old WordPress site's addresses |
 | `.github/workflows/` | Build and deploy (see docs/deployment.md) |
 | `scripts/visual-diff/` | Screenshot comparison of each pull request with `main` (see docs/deployment.md) |
@@ -889,6 +889,13 @@ pages, and its donation pages to Support. Firebase applies redirects before
 serving pages, so a redirect's `source` must never be the address of a page
 on this site, and a page that a redirect leads to keeps its address or gets
 a redirect of its own.
+
+**App user guides:** `public/guides/lms.pdf`, `kanban.pdf` and
+`time-tracker.pdf` are the apps' current user guides, served at
+`/guides/<name>.pdf` with no sign-in. Each app's release script replaces its
+file in a pull request (the guide goes live when the admin merges it): never
+edit them by hand, rename them, or move them, since people are given those
+addresses.
 
 ### Staff guide
 
